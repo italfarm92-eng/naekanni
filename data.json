@@ -109,7 +109,7 @@
       "no": 16,
       "date": "5/8",
       "house": "5",
-      "variety": "種まさり",
+      "variety": "まさり",
       "count": 19
     },
     {
@@ -118,6 +118,20 @@
       "house": "4",
       "variety": "Bごがね",
       "count": 6
+    },
+    {
+      "no": 18,
+      "date": "5/9",
+      "house": "4",
+      "variety": "たいがん",
+      "count": 15
+    },
+    {
+      "no": 19,
+      "date": "5/9",
+      "house": "中村",
+      "variety": "こがね",
+      "count": 16
     }
   ],
   "plantData": [
@@ -256,6 +270,54 @@
       "field": "としのり",
       "count": 5,
       "note": "床側縦式"
+    },
+    {
+      "id": 18,
+      "naeRef": 17,
+      "date": "5/9",
+      "field": "久子",
+      "count": 4,
+      "note": ""
+    },
+    {
+      "id": 19,
+      "naeRef": 8,
+      "date": "5/9",
+      "field": "別府小",
+      "count": 21,
+      "note": ""
+    },
+    {
+      "id": 20,
+      "naeRef": 10,
+      "date": "5/9",
+      "field": "久子",
+      "count": 2,
+      "note": ""
+    },
+    {
+      "id": 21,
+      "naeRef": 11,
+      "date": "5/9",
+      "field": "久子",
+      "count": 11,
+      "note": ""
+    },
+    {
+      "id": 22,
+      "naeRef": 11,
+      "date": "5/9",
+      "field": "久子",
+      "count": 4,
+      "note": ""
+    },
+    {
+      "id": 23,
+      "naeRef": 15,
+      "date": "5/9",
+      "field": "久子",
+      "count": 17,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -303,10 +365,16 @@
     {
       "name": "別府小",
       "note": ""
+    },
+    {
+      "name": "久子",
+      "note": ""
     }
   ],
   "hist": {
     "fields": [
+      "久子",
+      "別府小",
       "するき１",
       "正人黒山",
       "としのり",
@@ -314,12 +382,11 @@
       "つやこ上",
       "するき２",
       "大川道",
-      "エキ",
-      "別府小"
+      "エキ"
     ],
-    "lastField": "としのり",
-    "lastHouse": "4",
-    "lastVariety": ""
+    "lastField": "久子",
+    "lastHouse": "中村",
+    "lastVariety": "こがね"
   },
-  "_pid": 18
+  "_pid": 24
 }
