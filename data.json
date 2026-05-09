@@ -280,6 +280,14 @@
       "field": "久子",
       "count": 15,
       "note": ""
+    },
+    {
+      "id": 21,
+      "naeRef": 15,
+      "date": "5/8",
+      "field": "久子",
+      "count": 17,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -350,5 +358,5 @@
     "lastHouse": "4",
     "lastVariety": ""
   },
-  "_pid": 21
+  "_pid": 22
 }
