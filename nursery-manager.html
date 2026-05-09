@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>苗管理 N03 — R8.5.9</title>
+<title>苗管理 N03</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -18,7 +18,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--gy);color:var(--text
 header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between}
 .h-left h1{font-size:.9rem;font-weight:700}
 .h-left .h-sub{font-size:.58rem;color:rgba(255,255,255,.38);margin-bottom:1px}
-.hbadge{font-family:'Space Mono',monospace;font-size:.65rem;background:var(--g3);color:var(--g0);padding:2px 9px;border-radius:20px;font-weight:700}
+.hbtns{display:flex;gap:5px;align-items:center}
+.hbtn{border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;color:#fff}
+.hbtn.load{background:var(--g1)}
+.hbtn.save{background:var(--g2)}
+.hbtn.menu{background:var(--g1)}
+#sync-status{font-size:.58rem;color:rgba(255,255,255,.5);white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
 .tabs{display:flex;background:var(--g1);overflow-x:auto}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:1;min-width:46px;padding:9px 2px;text-align:center;color:rgba(255,255,255,.38);font-size:.62rem;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;transition:.18s;white-space:nowrap}
@@ -28,7 +33,6 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .stitle{font-size:.68rem;font-weight:700;color:var(--g2);letter-spacing:.09em;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:7px}
 .stitle::after{content:'';flex:1;height:1px;background:var(--g4)}
 .stitle:first-child{margin-top:0}
-
 /* variety cards */
 .vcard{background:var(--white);border-radius:13px;box-shadow:var(--sh);overflow:hidden;margin-bottom:9px;border-left:5px solid var(--g3)}
 .vcard.warn{border-left-color:var(--am)}.vcard.done{border-left-color:var(--red)}
@@ -46,22 +50,18 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .pbtn{background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:.72rem;font-weight:700;padding:5px 11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;transition:.15s;flex-shrink:0}
 .pbtn:hover{background:var(--g1)}
 .pbtn.ex{background:var(--sub);cursor:default}
-
 /* tags */
 .tag{font-size:.63rem;padding:2px 7px;border-radius:7px;background:var(--g5);color:var(--g1);white-space:nowrap;display:inline-block}
 .tag.h{background:var(--g4);color:var(--g0)}
 .tag.am{background:var(--am2);color:#7a5000}
 .tag.bl{background:var(--bl2);color:#0f3a80}
-.tag.pu{background:var(--pu2);color:#4c1d95}
 .rb{font-size:.65rem;padding:2px 7px;border-radius:8px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap;display:inline-block}
 .rok{background:var(--g5);color:var(--g2)}.rzero{background:var(--red2);color:var(--red)}.rneg{background:#f8d7da;color:var(--red)}
-
 /* sort bar */
 .sort-bar{display:flex;gap:5px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
 .sort-lbl{font-size:.65rem;color:var(--sub);flex-shrink:0}
 .spill{font-size:.67rem;padding:4px 10px;border-radius:18px;border:1.5px solid var(--bdr);background:var(--white);cursor:pointer;color:var(--sub);transition:.14s;font-family:'Noto Sans JP',sans-serif;white-space:nowrap}
 .spill.active{background:var(--g2);color:#fff;border-color:var(--g2)}
-
 /* stock cards */
 .scard{background:var(--white);border-radius:12px;margin-bottom:9px;box-shadow:var(--sh);overflow:hidden}
 .scard-row{display:flex;align-items:center;padding:10px 12px;gap:9px}
@@ -71,7 +71,6 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .scard-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
 .scard-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
 .scard-nums{font-size:.66rem;color:var(--sub);font-family:'Space Mono',monospace}
-
 /* ncard */
 .ncard{background:var(--white);border-radius:13px;margin-bottom:10px;box-shadow:var(--sh);overflow:hidden}
 .ncard-head{display:flex;align-items:stretch}
@@ -90,13 +89,11 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .prow-meta{display:flex;gap:4px;flex-wrap:wrap}
 .prow-count{font-family:'Space Mono',monospace;font-weight:700;color:var(--am);font-size:.86rem;white-space:nowrap}
 .prow-note{font-size:.66rem;color:var(--sub);font-style:italic}
-
 /* plant card */
 .plant-no-card{background:var(--white);border-radius:12px;margin-bottom:9px;box-shadow:var(--sh);overflow:hidden}
 .plant-no-head{background:var(--am);color:var(--g0);padding:8px 13px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.86rem;flex-wrap:wrap;gap:5px}
 .plant-row{padding:8px 13px;border-bottom:1px solid #f0ede6;font-size:.81rem}
 .plant-row:last-child{border:none}
-
 /* field card */
 .fcard{background:var(--white);border-radius:12px;margin-bottom:9px;box-shadow:var(--sh);overflow:hidden}
 .fcard-head{background:var(--pu);color:#fff;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.86rem;cursor:pointer}
@@ -104,7 +101,6 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .fcard-body.open{display:block}
 .fcard-row{display:flex;align-items:center;justify-content:space-between;padding:7px 13px;border-bottom:1px solid #f0ede6;font-size:.8rem;gap:6px}
 .fcard-row:last-child{border:none}
-
 /* summary */
 .sg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .sc{background:var(--white);border-radius:11px;padding:11px 12px;box-shadow:var(--sh);border-left:4px solid var(--g3)}
@@ -112,11 +108,9 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .sc .lbl{font-size:.63rem;color:var(--sub);margin-bottom:3px}
 .sc .val{font-family:'Space Mono',monospace;font-size:1.35rem;font-weight:700;color:var(--g0)}
 .sc .sub2{font-size:.63rem;color:var(--sub);margin-top:2px}
-
 /* fbar */
 .fbar{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
 .fbar input{flex:1;min-width:0;padding:8px 10px;border:1.5px solid var(--g4);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.8rem;background:var(--white);outline:none}
-
 /* nae add panel */
 .nae-panel{background:var(--g5);border-radius:12px;padding:13px;margin-bottom:12px;box-shadow:var(--sh)}
 .nae-panel-title{font-size:.75rem;font-weight:700;color:var(--g2);margin-bottom:10px}
@@ -134,12 +128,10 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .vpill{font-size:.68rem;padding:4px 10px;border-radius:14px;background:var(--am2);color:#7a5000;cursor:pointer;border:none;font-family:'Noto Sans JP',sans-serif;transition:.12s;white-space:nowrap}
 .vpill:hover{background:var(--am);color:#fff}
 .vpill.ap{background:var(--am);color:#fff}
-
 /* ibtn */
 .ibtn{background:none;border:none;cursor:pointer;padding:3px 5px;border-radius:6px;font-size:.82rem;line-height:1;transition:.13s}
 .ibtn:hover{background:var(--g5)}
 .ibtn.del:hover{background:var(--red2)}
-
 /* settings */
 .set-tabs{display:flex;background:var(--white);border-radius:10px;box-shadow:var(--sh);overflow:hidden;margin-bottom:12px}
 .set-tab{flex:1;padding:9px 4px;text-align:center;font-size:.7rem;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:3px solid transparent;transition:.15s}
@@ -152,12 +144,10 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .set-ri{flex:1}
 .set-rl{font-weight:600;color:var(--g0);font-size:.82rem}
 .set-rs{font-size:.66rem;color:var(--sub);margin-top:1px}
-
 /* drag edit rows */
 .ed-row{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #f0ede6;background:var(--white);transition:.15s}
 .ed-row:last-child{border:none}
 .ed-row.drag-over{background:var(--g5);border:2px dashed var(--g3)}
-.ed-row.dragging{opacity:.4}
 .drag-h{cursor:grab;color:var(--sub);font-size:1rem;padding:0 4px;touch-action:none;user-select:none;flex-shrink:0}
 .ed-inp{flex:1;padding:6px 9px;border:1.5px solid var(--g4);border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;outline:none;background:var(--white)}
 .ed-inp:focus{border-color:var(--g3)}
@@ -165,7 +155,6 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .add-row{display:flex;gap:8px;padding:10px 13px;border-top:1px solid var(--bdr)}
 .add-inp{flex:1;padding:8px 10px;border:1.5px solid var(--g4);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;outline:none}
 .add-btn{padding:8px 14px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer}
-
 /* CI sheet */
 .ci-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:400;align-items:flex-end;justify-content:center}
 .ci-overlay.open{display:flex}
@@ -198,14 +187,12 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .ci-save{width:100%;padding:13px;background:var(--g2);color:#fff;border:none;border-radius:11px;font-family:'Noto Sans JP',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:4px;transition:.15s}
 .ci-save:hover{background:var(--g1)}
 .ci-save:disabled{background:var(--sub);cursor:default}
-
 /* FAB */
 .fab-wrap{position:fixed;bottom:20px;right:15px;display:flex;flex-direction:column;align-items:flex-end;gap:9px;z-index:150}
 .fab{width:52px;height:52px;background:var(--g2);color:#fff;border:none;border-radius:50%;font-size:1.4rem;box-shadow:0 4px 18px rgba(40,99,74,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.18s}
 .fab:hover{transform:scale(1.08)}
 .fab.sub{width:44px;height:44px;font-size:1.1rem;background:var(--am);box-shadow:0 4px 14px rgba(212,148,26,.4)}
 .fab-lbl{font-size:.62rem;background:var(--g0);color:#fff;padding:3px 7px;border-radius:8px;white-space:nowrap}
-
 /* edit overlay */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
@@ -221,7 +208,14 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .btn-c{flex:1;padding:10px;border:1.5px solid var(--bdr);border-radius:8px;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;color:var(--sub);cursor:pointer}
 .btn-s{flex:2;padding:10px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer}
 .btn-del{flex:1;padding:10px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer}
-
+/* data menu */
+.dmenu-ov{display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.3)}
+.dmenu{display:none;position:fixed;top:52px;right:12px;z-index:260;background:var(--white);border-radius:13px;box-shadow:0 4px 24px rgba(0,0,0,.18);overflow:hidden;min-width:200px}
+.dmenu-head{background:var(--g1);color:#fff;padding:8px 14px;font-size:.72rem;font-weight:700}
+.dmenu-item{width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr);display:block}
+.dmenu-item:last-child{border:none}
+.dmenu-item:hover{background:var(--g5)}
+.dmenu-item.red{color:var(--red)}
 /* toast */
 .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--g0);color:#fff;padding:8px 18px;border-radius:20px;font-size:.76rem;z-index:600;opacity:0;transition:opacity .28s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
@@ -235,28 +229,24 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
     <div class="h-sub">苗管理 N03 ／ 令和8年5月9日</div>
     <h1>🌱 苗・植え付け管理</h1>
   </div>
-  <div style="display:flex;gap:5px;align-items:center">
-    <button onclick="loadFromGitHub()"
-      style="background:var(--g1);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap">☁️ 読込</button>
-    <button onclick="saveToGitHub()"
-      style="background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap">💾 保存</button>
-    <button onclick="showDataMenu()"
-      style="background:var(--g1);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap">⋯</button>
+  <div class="hbtns">
+    <span id="sync-status">待機中</span>
+    <button class="hbtn load" onclick="loadFromGitHub()">☁️ 読込</button>
+    <button class="hbtn save" onclick="saveToGitHub()">💾 保存</button>
+    <button class="hbtn menu" onclick="showMenu()">⋯</button>
   </div>
 </header>
 
 <!-- DATA MENU -->
-<div id="data-menu-overlay" onclick="hideDataMenu()"
-  style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.3)"></div>
-<div id="data-menu"
-  style="display:none;position:fixed;top:52px;right:12px;z-index:260;background:var(--white);border-radius:13px;box-shadow:0 4px 24px rgba(0,0,0,.18);overflow:hidden;min-width:190px">
-  <div style="background:var(--g1);color:#fff;padding:8px 14px;font-size:.72rem;font-weight:700">データ管理</div>
-  <div id="sync-btn" style="padding:7px 14px;font-size:.7rem;color:var(--sub);border-bottom:1px solid var(--bdr)">☁️ 状態: 待機中</div>
-  <button onclick="promptToken();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr)">🔑 GitHubトークン設定</button>
-  <button onclick="exportJSON();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr)">📥 バックアップ保存（JSON）</button>
-  <button onclick="importJSON();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr)">📤 バックアップから復元</button>
-  <button onclick="clearLocal();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;color:var(--red)">🗑 データをリセット</button>
+<div class="dmenu-ov" id="dmenu-ov" onclick="hideMenu()"></div>
+<div class="dmenu" id="dmenu">
+  <div class="dmenu-head">データ管理</div>
+  <button class="dmenu-item" onclick="doSetToken();hideMenu()">🔑 GitHubトークン設定</button>
+  <button class="dmenu-item" onclick="doExport();hideMenu()">📥 バックアップ（JSON）</button>
+  <button class="dmenu-item" onclick="doImport();hideMenu()">📤 バックアップから復元</button>
+  <button class="dmenu-item red" onclick="doClear();hideMenu()">🗑 データをリセット</button>
 </div>
+
 <div class="tabs">
   <div class="tab active" onclick="sw('dash')">📊 概要</div>
   <div class="tab"        onclick="sw('stock')">📦 在庫</div>
@@ -265,6 +255,7 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
   <div class="tab"        onclick="sw('field')">📍 畑</div>
   <div class="tab"        onclick="sw('settings')">⚙️ 設定</div>
 </div>
+
 <div id="page-dash"     class="page active"></div>
 <div id="page-stock"    class="page"></div>
 <div id="page-nae"      class="page"></div>
@@ -362,7 +353,7 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 </div>
 
 <script>
-// ═══════════════════════ DATA ═══════════════════════
+// ══════════ DATA ══════════
 let naeData = [
   {no:1,  date:'4/30',house:'4',          variety:'たいがん',   count:20},
   {no:2,  date:'4/30',house:'4',          variety:'Bごがね',    count:8},
@@ -402,149 +393,248 @@ let plantData = [
   {id:17, naeRef:12, date:'5/7', field:'としのり', count:5,    note:'床側縦式'},
 ];
 let _pid = 18;
-
-// 品種マスタ — これが唯一の並び順ソース
 let varietyOrder = ['たいがん','Bごがね','こがね','みちしずく','紅まさり','まさり','種まさり'];
-
-// 畑マスタ
-let fieldMaster = [
+let fieldMaster  = [
   {name:'するき１',note:''},{name:'正人黒山',note:''},{name:'としのり',note:''},
   {name:'フキエ',note:''},{name:'つやこ上',note:''},{name:'するき２',note:''},
   {name:'大川道',note:''},{name:'エキ',note:''},{name:'別府小',note:''},
 ];
+let hist = {fields:['するき１','正人黒山','としのり','フキエ','つやこ上','するき２','大川道','エキ','別府小'],lastField:'としのり',lastHouse:'4',lastVariety:''};
 
-let hist = {
-  fields:['するき１','正人黒山','としのり','フキエ','つやこ上','するき２','大川道','エキ','別府小'],
-  lastField:'としのり', lastHouse:'4', lastVariety:'',
-};
+// ══════════ GITHUB SYNC ══════════
+const GH_REPO = 'italfarm92-eng/naekanni';
+const GH_FILE = 'data.json';
+const GH_API  = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE;
+const TK_KEY  = 'gh_tk_naekanni';
+const LS_KEY  = 'naekanni_v2';
 
-// ═══════════════════════ HELPERS ═══════════════════════
-const TODAY = new Date(2026,4,9); // R8.5.9固定
+let _dirty = false;
+let _saving = false;
+
+function setSyncStatus(msg) {
+  const el = document.getElementById('sync-status');
+  if(el) el.textContent = msg;
+}
+
+function getToken()  { return localStorage.getItem(TK_KEY) || ''; }
+function saveToken(t){ localStorage.setItem(TK_KEY, t.trim()); }
+
+function doSetToken() {
+  const cur = getToken();
+  const t = prompt(
+    'GitHub Personal Access Tokenを入力\n\n' +
+    '取得: GitHub → Settings → Developer settings\n' +
+    '→ Personal access tokens → Tokens(classic)\n' +
+    '→ Generate new token → repo にチェック\n\n' +
+    '現在: ' + (cur ? cur.slice(0,8)+'...' : '未設定'), cur);
+  if(t !== null && t.trim()) { saveToken(t); toast('✅ トークンを保存しました'); }
+}
+
+// JSON → UTF-8 base64
+function toB64(obj) {
+  const str = JSON.stringify(obj, null, 2);
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+
+// base64 → JSON
+function fromB64(b64) {
+  const bin = atob(b64.replace(/\s/g,''));
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+}
+
+async function loadFromGitHub() {
+  setSyncStatus('読込中…');
+  try {
+    const res = await fetch(GH_API + '?t=' + Date.now(), {
+      headers:{'Accept':'application/vnd.github+json','Cache-Control':'no-cache'}
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const meta = await res.json();
+    const json = fromB64(meta.content);
+    applyData(json);
+    saveLocal();
+    _dirty = false;
+    setSyncStatus('✅ 読込済');
+    renderAll();
+    toast('✅ GitHubからデータを読み込みました');
+  } catch(e) {
+    setSyncStatus('❌ 読込失敗');
+    toast('❌ 読込失敗: ' + e.message);
+  }
+}
+
+async function saveToGitHub() {
+  const token = getToken();
+  if(!token) { doSetToken(); return; }
+  if(_saving) return;
+  _saving = true;
+  setSyncStatus('保存中…');
+  try {
+    // 現在のSHAを取得
+    let sha = null;
+    const r = await fetch(GH_API, {
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}
+    });
+    if(r.ok) { const m = await r.json(); sha = m.sha; }
+
+    const body = {
+      message:'データ更新 ' + new Date().toLocaleString('ja-JP'),
+      content: toB64({naeData,plantData,varietyOrder,fieldMaster,hist,_pid}),
+    };
+    if(sha) body.sha = sha;
+
+    const rp = await fetch(GH_API, {
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    if(!rp.ok) { const e=await rp.json(); throw new Error(e.message||'HTTP '+rp.status); }
+    _dirty = false;
+    saveLocal();
+    setSyncStatus('✅ ' + new Date().toLocaleTimeString('ja-JP'));
+    toast('✅ GitHubに保存しました');
+  } catch(e) {
+    setSyncStatus('❌ 保存失敗');
+    toast('❌ 保存失敗: ' + e.message);
+  } finally {
+    _saving = false;
+  }
+}
+
+function applyData(d) {
+  if(d.naeData      && d.naeData.length)      naeData      = d.naeData;
+  if(d.plantData    && d.plantData.length)     plantData    = d.plantData;
+  if(d.varietyOrder && d.varietyOrder.length)  varietyOrder = d.varietyOrder;
+  if(d.fieldMaster  && d.fieldMaster.length)   fieldMaster  = d.fieldMaster;
+  if(d.hist)                                   hist         = d.hist;
+  if(d._pid)                                   _pid         = d._pid;
+  if(plantData.length) _pid = Math.max(_pid, Math.max(...plantData.map(p=>p.id))+1);
+}
+
+// ══════════ LOCAL STORAGE ══════════
+function saveLocal() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify({naeData,plantData,varietyOrder,fieldMaster,hist,_pid})); } catch(e){}
+}
+function loadLocal() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LS_KEY)||'null');
+    if(!d) return false;
+    applyData(d); return true;
+  } catch(e){ return false; }
+}
+
+// データ変更のたびにローカル保存＋dirty
+function onDataChanged() {
+  saveLocal();
+  _dirty = true;
+  setSyncStatus('未保存 ●');
+}
+
+// 自動保存（30秒ごと）
+setInterval(async () => {
+  if(_dirty && getToken() && !_saving) await saveToGitHub();
+}, 30000);
+
+// バックグラウンド移行時に保存
+document.addEventListener('visibilitychange', async () => {
+  if(document.visibilityState === 'hidden' && _dirty && getToken()) await saveToGitHub();
+});
+
+// エクスポート・インポート
+function doExport() {
+  const blob = new Blob([JSON.stringify({naeData,plantData,varietyOrder,fieldMaster},null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'naekanni_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('✅ バックアップを保存しました');
+}
+function doImport() {
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='.json';
+  inp.onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        if(!d.naeData){toast('⚠ 正しいファイルではありません');return;}
+        if(!confirm('現在のデータを上書きしますか？'))return;
+        applyData(d); onDataChanged(); renderAll();
+        toast('✅ インポートしました');
+      } catch(e){ toast('⚠ 読み込みエラー: '+e.message); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+function doClear() {
+  if(!confirm('すべてのデータをリセットしますか？\nこの操作は取り消せません。'))return;
+  localStorage.removeItem(LS_KEY);
+  toast('🗑 リセットしました。ページを再読み込みしてください。');
+}
+
+// ══════════ MENU ══════════
+function showMenu(){ document.getElementById('dmenu-ov').style.display='block'; document.getElementById('dmenu').style.display='block'; }
+function hideMenu(){ document.getElementById('dmenu-ov').style.display='none';  document.getElementById('dmenu').style.display='none'; }
+
+// ══════════ HELPERS ══════════
+const TODAY = new Date(2026,4,9);
 const todayStr = () => '2026-05-09';
 const dateVal  = s => s?s.replace(/\d{4}-(\d{2})-(\d{2})/,(_,m,d)=>`${+m}/${+d}`):'';
 const fmt      = n => n==null?'—':(n%1===0?String(n):(+n).toFixed(1));
 const esc      = s => s.replace(/[^a-zA-Z0-9]/g,'_');
 
-function parseNaeDate(s){
-  if(!s)return null;
-  const m=s.match(/(\d+)\/(\d+)/);
-  return m?new Date(2026,+m[1]-1,+m[2]):null;
-}
-function daysSince(s){
-  const d=parseNaeDate(s); if(!d)return 0;
-  return Math.floor((TODAY-d)/(86400000));
-}
-
+function parseNaeDate(s){ const m=s&&s.match(/(\d+)\/(\d+)/); return m?new Date(2026,+m[1]-1,+m[2]):null; }
+function daysSince(s){ const d=parseNaeDate(s); return d?Math.floor((TODAY-d)/86400000):0; }
 function plantedForNae(no){ return plantData.filter(p=>p.naeRef===no).reduce((s,p)=>s+p.count,0); }
 function remForNae(no){ const n=naeData.find(d=>d.no===no); return n?n.count-plantedForNae(no):0; }
-
-function allVarieties(){
-  const extra=[...new Set(naeData.map(d=>d.variety))].filter(v=>!varietyOrder.includes(v));
-  return [...varietyOrder,...extra];
-}
+function allVarieties(){ return [...varietyOrder,...[...new Set(naeData.map(d=>d.variety))].filter(v=>!varietyOrder.includes(v))]; }
 function naeTotalByVar(v){ return naeData.filter(d=>d.variety===v).reduce((s,d)=>s+d.count,0); }
 function naePlantedByVar(v){ return naeData.filter(d=>d.variety===v).reduce((s,n)=>s+plantedForNae(n.no),0); }
-
-function plantNoLabel(pid){
-  const p=plantData.find(d=>d.id===pid); if(!p||p.naeRef==null)return '?';
-  const sibs=plantData.filter(d=>d.naeRef===p.naeRef);
-  return sibs.length===1?String(p.naeRef):`${p.naeRef}-${sibs.findIndex(d=>d.id===pid)+1}`;
-}
-
-function allFields(){
-  const mn=fieldMaster.map(f=>f.name);
-  const extra=[...new Set(plantData.map(p=>p.field))].filter(f=>!mn.includes(f));
-  return [...mn,...extra];
-}
-function refreshFlists(){
-  ['flist','ci-flist'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML=allFields().map(f=>`<option value="${f}">`).join('');
-  });
-}
-function refreshVlist(){
-  const el=document.getElementById('vlist');
-  if(el) el.innerHTML=allVarieties().map(v=>`<option value="${v}">`).join('');
-}
-function recordHist(f){
-  if(!f)return;
-  hist.fields=[f,...hist.fields.filter(x=>x!==f)].slice(0,12);
-  hist.lastField=f;
-  if(!fieldMaster.some(fm=>fm.name===f)) fieldMaster.push({name:f,note:''});
-  refreshFlists();
-}
-
+function plantNoLabel(pid){ const p=plantData.find(d=>d.id===pid); if(!p||p.naeRef==null)return '?'; const s=plantData.filter(d=>d.naeRef===p.naeRef); return s.length===1?String(p.naeRef):`${p.naeRef}-${s.findIndex(d=>d.id===pid)+1}`; }
+function allFields(){ const mn=fieldMaster.map(f=>f.name); return [...mn,...[...new Set(plantData.map(p=>p.field))].filter(f=>!mn.includes(f))]; }
+function refreshFlists(){ ['flist','ci-flist'].forEach(id=>{ const e=document.getElementById(id); if(e)e.innerHTML=allFields().map(f=>`<option value="${f}">`).join(''); }); }
+function refreshVlist(){ const e=document.getElementById('vlist'); if(e)e.innerHTML=allVarieties().map(v=>`<option value="${v}">`).join(''); }
+function recordHist(f){ if(!f)return; hist.fields=[f,...hist.fields.filter(x=>x!==f)].slice(0,12); hist.lastField=f; if(!fieldMaster.some(m=>m.name===f))fieldMaster.push({name:f,note:''}); refreshFlists(); }
 function rbCls(r){ return r>0?'rok':r===0?'rzero':'rneg'; }
 function rbLbl(r){ return r>0?`残 ${fmt(r)}`:r===0?'完植':`⚠ ${fmt(r)}`; }
+function toast(msg,dur=2400){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),dur); }
 
-function toast(msg,dur=2400){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),dur);
-}
-function rerenderBg(){
+// rerenderBg: 画面更新＋データ保存
+function rerenderBg(){ renderAll(); onDataChanged(); }
+
+function renderAll(){
   renderDash();
   const keys=['dash','stock','nae','plant','field','settings'];
   const i=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
   if(i>0&&renderMap[keys[i]]) renderMap[keys[i]]();
-  saveLocalOnly();   // 端末ローカルに即保存
-  markDirty();       // GitHub保存待ちフラグを立てる
 }
 
-// ═══════════════════════ ALERT ═══════════════════════
-// 苗採りから5日以上経過して残りある苗
-function alertNaes(){
-  return naeData.filter(n=>remForNae(n.no)>0&&daysSince(n.date)>=5)
-    .map(n=>({...n,days:daysSince(n.date),rem:remForNae(n.no)}));
-}
+// ══════════ ALERT ══════════
+function alertNaes(){ return naeData.filter(n=>remForNae(n.no)>0&&daysSince(n.date)>=5).map(n=>({...n,days:daysSince(n.date),rem:remForNae(n.no)})); }
 
-// ═══════════════════════ CI ═══════════════════════
+// ══════════ CI ══════════
 let ciNaeNo=null, ciSession=[];
-function openCI(preNo){
-  ciSession=[]; ciNaeNo=preNo;
-  document.getElementById('ci-overlay').classList.add('open');
-  buildChips();
-  if(preNo!=null) selectCiNae(preNo);
-  else renderCiForm();
-}
+function openCI(preNo){ ciSession=[]; ciNaeNo=preNo; document.getElementById('ci-overlay').classList.add('open'); buildChips(); if(preNo!=null)selectCiNae(preNo); else renderCiForm(); }
 function closeCI(){ document.getElementById('ci-overlay').classList.remove('open'); rerenderBg(); }
-function buildChips(){
-  document.getElementById('ci-chips').innerHTML=naeData.map(n=>{
-    const rem=remForNae(n.no),ex=rem<=0,sel=n.no===ciNaeNo;
-    return `<button class="ci-chip${sel?' sel':''}${ex?' ex':''}" ${ex?'':'onclick="selectCiNae('+n.no+')"'}
-      title="${n.variety}/H${n.house}/残${fmt(rem)}">No.${n.no}<br><span style="font-size:.58rem;opacity:.75">${n.variety}<br>${fmt(rem)}箱</span></button>`;
-  }).join('');
-}
-function selectCiNae(no){
-  if(remForNae(no)<=0){toast('⚠ 完植です');return;}
-  ciNaeNo=no; buildChips(); renderCiForm();
-}
+function buildChips(){ document.getElementById('ci-chips').innerHTML=naeData.map(n=>{ const rem=remForNae(n.no),ex=rem<=0,sel=n.no===ciNaeNo; return `<button class="ci-chip${sel?' sel':''}${ex?' ex':''}" ${ex?'':'onclick="selectCiNae('+n.no+')"'}>No.${n.no}<br><span style="font-size:.58rem;opacity:.75">${n.variety}<br>${fmt(rem)}箱</span></button>`; }).join(''); }
+function selectCiNae(no){ if(remForNae(no)<=0){toast('⚠ 完植です');return;} ciNaeNo=no; buildChips(); renderCiForm(); }
 function renderCiForm(){
   const n=ciNaeNo!=null?naeData.find(d=>d.no===ciNaeNo):null;
   const rem=n?remForNae(n.no):0;
-  const info=document.getElementById('ci-sel-info');
-  info.innerHTML=n
-    ?`<div><div style="font-weight:700;font-size:.9rem">苗No.${n.no}　${n.variety}</div>
-       <div style="font-size:.7rem;color:var(--sub)">H${n.house} ／ ${n.date} ／ 採${fmt(n.count)}箱</div></div>
-       <span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span>`
+  document.getElementById('ci-sel-info').innerHTML=n
+    ?`<div><div style="font-weight:700;font-size:.9rem">苗No.${n.no}　${n.variety}</div><div style="font-size:.7rem;color:var(--sub)">H${n.house} ／ ${n.date} ／ 採${fmt(n.count)}箱</div></div><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span>`
     :`<div style="color:var(--sub);font-size:.85rem">← 苗Noを選択してください</div>`;
-  // log
-  const logWrap=document.getElementById('ci-log');
   const ses=plantData.filter(p=>ciSession.includes(p.id));
-  if(ses.length){
-    logWrap.style.display='block';
-    document.getElementById('ci-log-items').innerHTML=ses.map(p=>`
-      <div class="ci-log-item">
-        <div class="ci-log-l">
-          <span class="tag am" style="font-size:.62rem">苗${p.naeRef}</span>
-          <span style="font-weight:600">📍${p.field}</span>
-          <span class="tag">${fmt(p.count)}箱</span>
-          <span style="font-size:.65rem;color:var(--sub)">${p.date}</span>
-        </div>
-        <button class="ci-undo" onclick="ciUndo(${p.id})">↩取消</button>
-      </div>`).join('');
-  } else logWrap.style.display='none';
-  // form
+  const lw=document.getElementById('ci-log');
+  lw.style.display=ses.length?'block':'none';
+  if(ses.length) document.getElementById('ci-log-items').innerHTML=ses.map(p=>`<div class="ci-log-item"><div class="ci-log-l"><span class="tag am" style="font-size:.62rem">苗${p.naeRef}</span><span style="font-weight:600">📍${p.field}</span><span class="tag">${fmt(p.count)}箱</span><span style="font-size:.65rem;color:var(--sub)">${p.date}</span></div><button class="ci-undo" onclick="ciUndo(${p.id})">↩取消</button></div>`).join('');
   const fw=document.getElementById('ci-form-wrap');
   if(!n){fw.style.display='none';return;}
   fw.style.display='block';
@@ -553,17 +643,12 @@ function renderCiForm(){
   document.getElementById('ci-count').value='';
   document.getElementById('ci-field').value=hist.lastField;
   document.getElementById('ci-note').value='';
-  // history pills
-  document.getElementById('ci-hist').innerHTML=hist.fields.slice(0,8).map(f=>{
-    const ap=f===hist.lastField?' ap':'';
-    return `<button class="hpill${ap}" onclick="ciSetField('${f.replace(/'/g,"\\'")}')">📍${f}</button>`;
-  }).join('');
+  document.getElementById('ci-hist').innerHTML=hist.fields.slice(0,8).map(f=>`<button class="hpill${f===hist.lastField?' ap':''}" onclick="ciSetF('${f.replace(/'/g,"\\'")}')">📍${f}</button>`).join('');
   refreshFlists();
-  const btn=document.getElementById('ci-save-btn');
-  btn.disabled=rem<=0; btn.textContent=rem<=0?'完植':'植え付けを保存 → 次へ';
+  const btn=document.getElementById('ci-save-btn'); btn.disabled=rem<=0; btn.textContent=rem<=0?'完植':'植え付けを保存 → 次へ';
   setTimeout(()=>{const c=document.getElementById('ci-count');if(c)c.focus();},80);
 }
-function ciSetField(f){ document.getElementById('ci-field').value=f; hist.lastField=f; renderCiForm(); }
+function ciSetF(f){ document.getElementById('ci-field').value=f; hist.lastField=f; renderCiForm(); }
 function ciSave(){
   if(ciNaeNo==null){toast('⚠ 苗Noを選んでください');return;}
   const field=document.getElementById('ci-field').value.trim();
@@ -578,269 +663,57 @@ function ciSave(){
   plantData.push({id:newId,naeRef:ciNaeNo,date,field,count,note});
   ciSession.push(newId);
   recordHist(field);
+  onDataChanged(); // ← ここで即保存
   const nae=naeData.find(n=>n.no===ciNaeNo);
   toast(`✅ 苗No.${ciNaeNo}（${nae?.variety}）→${field} ${fmt(count)}箱`,1800);
-  if(remForNae(ciNaeNo)<=0){
-    const next=naeData.find(n=>n.no>ciNaeNo&&remForNae(n.no)>0);
-    if(next){ciNaeNo=next.no;toast(`完植。次の苗No.${next.no}（${next.variety}）へ`,2200);}
-  }
+  if(remForNae(ciNaeNo)<=0){ const next=naeData.find(n=>n.no>ciNaeNo&&remForNae(n.no)>0); if(next){ciNaeNo=next.no;toast(`完植。次の苗No.${next.no}へ`,2200);} }
   buildChips(); renderCiForm();
 }
-function ciUndo(id){
-  plantData=plantData.filter(p=>p.id!==id);
-  ciSession=ciSession.filter(x=>x!==id);
-  buildChips(); renderCiForm(); toast('↩ 取り消しました');
-}
+function ciUndo(id){ plantData=plantData.filter(p=>p.id!==id); ciSession=ciSession.filter(x=>x!==id); onDataChanged(); buildChips(); renderCiForm(); toast('↩ 取り消しました'); }
 
-// ═══════════════════════ DASHBOARD ═══════════════════════
+// ══════════ DASHBOARD ══════════
 function renderDash(){
   const el=document.getElementById('page-dash');
   const totalNae=naeData.reduce((s,d)=>s+d.count,0);
   const totalPlant=plantData.reduce((s,d)=>s+d.count,0);
   const houses=[...new Set(naeData.map(d=>d.house))];
-  const vrows=allVarieties().map(v=>{
-    const total=naeTotalByVar(v),planted=naePlantedByVar(v),rem=total-planted;
-    return {v,total,planted,rem};
-  }).filter(r=>r.total>0);
-
-  // alert banner
+  const vrows=allVarieties().map(v=>({v,total:naeTotalByVar(v),planted:naePlantedByVar(v),rem:naeTotalByVar(v)-naePlantedByVar(v)})).filter(r=>r.total>0);
   const alts=alertNaes();
-  const alertHtml=alts.length?`
-    <div style="background:#fff3cd;border:1.5px solid var(--am);border-radius:12px;padding:11px 13px;margin-bottom:10px">
-      <div style="font-size:.75rem;font-weight:700;color:#7a5000;margin-bottom:7px">⚠️ 植え付け遅延アラート（苗採りから5日以上）</div>
-      ${alts.map(n=>`
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-top:1px solid #ffe69c;font-size:.8rem;gap:5px">
-          <div>
-            <span style="font-family:'Space Mono',monospace;color:var(--g2);font-weight:700">No.${n.no}</span>
-            <span style="font-weight:600;margin-left:5px">${n.variety}</span>
-            <span class="tag" style="margin-left:4px">H${n.house}</span>
-            <span style="font-size:.68rem;color:#7a5000;margin-left:4px">${n.date}採（${n.days}日経過）</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:5px">
-            <span class="rb rneg" style="font-size:.62rem">残${fmt(n.rem)}箱</span>
-            <button class="pbtn" style="font-size:.67rem;padding:4px 9px" onclick="openCI(${n.no})">🌾植付</button>
-          </div>
-        </div>`).join('')}
-    </div>`:'' ;
-
-  el.innerHTML=`
-    ${alertHtml}
-    <div class="stitle">品種別 在庫</div>
-    ${vrows.map(({v,total,planted,rem})=>{
-      const pc=total>0?Math.min(100,Math.round(planted/total*100)):0;
-      const cls=rem<=0?'done':pc>=80?'warn':'';
-      const naes=naeData.filter(n=>n.variety===v);
-      const vid='vc_'+esc(v);
-      return `<div class="vcard ${cls}">
-        <div class="vcard-head" onclick="toggleVC('${vid}')">
-          <div style="flex:1">
-            <div class="vname">${v}</div>
-            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:4px">
-              <span class="tag">採${fmt(total)}箱</span>
-              <span class="tag am">植${fmt(planted)}箱</span>
-              <span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span>
-            </div>
-            <div class="vcard-pbar"><div class="vcard-pfill" style="width:${pc}%;background:${rem<=0?'var(--red)':pc>=80?'var(--am)':'var(--g3)'}"></div></div>
-          </div>
-          <span style="color:var(--g4);margin-left:10px;font-size:1.1rem">▾</span>
-        </div>
-        <div class="vcard-body" id="${vid}">
-          ${naes.map(n=>{
-            const nr=remForNae(n.no), over=daysSince(n.date)>=5&&nr>0;
-            return `<div class="vn-row" ${over?'style="background:#fffbf0"':''}>
-              <div class="vn-left">
-                <div class="vn-label">
-                  <span style="font-family:'Space Mono',monospace;color:var(--g2);font-weight:700">No.${n.no}</span>
-                  <span class="tag h">H${n.house}</span>
-                  <span class="tag">${n.date}</span>
-                  ${over?`<span class="tag am">⚠${daysSince(n.date)}日</span>`:''}
-                </div>
-                <div class="vn-meta"><span class="tag">採${fmt(n.count)}箱</span><span class="rb ${rbCls(nr)}">${rbLbl(nr)}</span></div>
-              </div>
-              <button class="${nr<=0?'pbtn ex':'pbtn'}" ${nr<=0?'disabled':''} onclick="openCI(${n.no})">
-                ${nr<=0?'完植':'🌾 植付入力'}
-              </button>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
-    }).join('')}
-    <div class="stitle" style="margin-top:20px">集計</div>
-    <div class="sg">
-      <div class="sc"><div class="lbl">苗採り 総箱数</div><div class="val">${fmt(totalNae)}</div><div class="sub2">No.1〜${Math.max(...naeData.map(d=>d.no))}</div></div>
-      <div class="sc am"><div class="lbl">植え付け 総箱数</div><div class="val">${fmt(totalPlant)}</div><div class="sub2">${plantData.length}件</div></div>
-      <div class="sc"><div class="lbl">使用ハウス</div><div class="val">${houses.length}</div><div class="sub2">棟</div></div>
-      <div class="sc bl"><div class="lbl">品種数</div><div class="val">${allVarieties().filter(v=>naeTotalByVar(v)>0).length}</div><div class="sub2">種類</div></div>
-    </div>`;
+  const alertHtml=alts.length?`<div style="background:#fff3cd;border:1.5px solid var(--am);border-radius:12px;padding:11px 13px;margin-bottom:10px"><div style="font-size:.75rem;font-weight:700;color:#7a5000;margin-bottom:7px">⚠️ 植え付け遅延（苗採りから5日以上）</div>${alts.map(n=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-top:1px solid #ffe69c;font-size:.8rem;gap:5px"><div><span style="font-family:'Space Mono',monospace;color:var(--g2);font-weight:700">No.${n.no}</span><span style="font-weight:600;margin-left:5px">${n.variety}</span><span class="tag" style="margin-left:4px">H${n.house}</span><span style="font-size:.68rem;color:#7a5000;margin-left:4px">${n.date}採（${n.days}日）</span></div><div style="display:flex;align-items:center;gap:5px"><span class="rb rneg" style="font-size:.62rem">残${fmt(n.rem)}箱</span><button class="pbtn" style="font-size:.67rem;padding:4px 9px" onclick="openCI(${n.no})">🌾植付</button></div></div>`).join('')}</div>`:'' ;
+  el.innerHTML=`${alertHtml}<div class="stitle">品種別 在庫</div>${vrows.map(({v,total,planted,rem})=>{ const pc=total>0?Math.min(100,Math.round(planted/total*100)):0; const cls=rem<=0?'done':pc>=80?'warn':''; const naes=naeData.filter(n=>n.variety===v); const vid='vc_'+esc(v); return `<div class="vcard ${cls}"><div class="vcard-head" onclick="toggleVC('${vid}')"><div style="flex:1"><div class="vname">${v}</div><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:4px"><span class="tag">採${fmt(total)}箱</span><span class="tag am">植${fmt(planted)}箱</span><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span></div><div class="vcard-pbar"><div class="vcard-pfill" style="width:${pc}%;background:${rem<=0?'var(--red)':pc>=80?'var(--am)':'var(--g3)'}"></div></div></div><span style="color:var(--g4);margin-left:10px;font-size:1.1rem">▾</span></div><div class="vcard-body" id="${vid}">${naes.map(n=>{ const nr=remForNae(n.no),over=daysSince(n.date)>=5&&nr>0; return `<div class="vn-row" ${over?'style="background:#fffbf0"':''}><div class="vn-left"><div class="vn-label"><span style="font-family:'Space Mono',monospace;color:var(--g2);font-weight:700">No.${n.no}</span><span class="tag h">H${n.house}</span><span class="tag">${n.date}</span>${over?`<span class="tag am">⚠${daysSince(n.date)}日</span>`:''}</div><div class="vn-meta"><span class="tag">採${fmt(n.count)}箱</span><span class="rb ${rbCls(nr)}">${rbLbl(nr)}</span></div></div><button class="${nr<=0?'pbtn ex':'pbtn'}" ${nr<=0?'disabled':''} onclick="openCI(${n.no})">${nr<=0?'完植':'🌾 植付入力'}</button></div>`; }).join('')}</div></div>`; }).join('')}<div class="stitle" style="margin-top:20px">集計</div><div class="sg"><div class="sc"><div class="lbl">苗採り 総箱数</div><div class="val">${fmt(totalNae)}</div><div class="sub2">No.1〜${Math.max(...naeData.map(d=>d.no))}</div></div><div class="sc am"><div class="lbl">植え付け 総箱数</div><div class="val">${fmt(totalPlant)}</div><div class="sub2">${plantData.length}件</div></div><div class="sc"><div class="lbl">使用ハウス</div><div class="val">${houses.length}</div><div class="sub2">棟</div></div><div class="sc bl"><div class="lbl">品種数</div><div class="val">${allVarieties().filter(v=>naeTotalByVar(v)>0).length}</div><div class="sub2">種類</div></div></div>`;
 }
 function toggleVC(id){ const b=document.getElementById(id);if(b)b.classList.toggle('open'); }
 
-// ═══════════════════════ STOCK ═══════════════════════
+// ══════════ STOCK ══════════
 let stockSort='no_asc';
 const SSORTS=[['no_asc','苗No↑'],['no_desc','苗No↓'],['variety','品種'],['house','ハウス'],['count','箱数多'],['rem_desc','残り多'],['rem_asc','残り少']];
 function renderStock(){
   const el=document.getElementById('page-stock');
   const rows=naeData.map(r=>({...r,planted:plantedForNae(r.no),rem:r.count-plantedForNae(r.no)}));
-  rows.sort((a,b)=>{
-    if(stockSort==='no_asc')   return a.no-b.no;
-    if(stockSort==='no_desc')  return b.no-a.no;
-    if(stockSort==='variety')  return allVarieties().indexOf(a.variety)-allVarieties().indexOf(b.variety);
-    if(stockSort==='house')    return a.house.localeCompare(b.house,'ja');
-    if(stockSort==='count')    return b.count-a.count;
-    if(stockSort==='rem_desc') return b.rem-a.rem;
-    if(stockSort==='rem_asc')  return a.rem-b.rem;
-    return 0;
-  });
-  el.innerHTML=`
-    <div class="sort-bar"><span class="sort-lbl">並び：</span>${SSORTS.map(([k,l])=>`<button class="spill ${stockSort===k?'active':''}" onclick="stockSort='${k}';renderStock()">${l}</button>`).join('')}</div>
-    ${rows.map(r=>`
-      <div class="scard">
-        <div class="scard-row">
-          <div class="scard-no">No.${r.no}</div>
-          <div class="scard-info" onclick="openCI(${r.no})" style="cursor:pointer">
-            <div class="scard-variety">${r.variety}</div>
-            <div class="scard-meta"><span class="tag h">H${r.house}</span><span class="tag">${r.date}</span></div>
-          </div>
-          <div class="scard-right" onclick="openCI(${r.no})" style="cursor:pointer">
-            <div class="scard-nums">採${fmt(r.count)} 植${fmt(r.planted)}</div>
-            <span class="rb ${rbCls(r.rem)}">${rbLbl(r.rem)}</span>
-          </div>
-          <div style="display:flex;gap:3px;align-items:center;flex-shrink:0">
-            ${r.rem>0?`<button class="pbtn" style="font-size:.68rem;padding:5px 8px" onclick="openCI(${r.no})">🌾</button>`:''}
-            <button class="ibtn" onclick="editNae(${r.no})">✏️</button>
-          </div>
-        </div>
-      </div>`).join('')}
-    <div class="stitle">品種別まとめ</div>
-    <div style="background:var(--white);border-radius:12px;box-shadow:var(--sh);overflow:hidden">
-      ${allVarieties().filter(v=>naeTotalByVar(v)>0).map(v=>{
-        const total=naeTotalByVar(v),planted=naePlantedByVar(v),rem=total-planted;
-        const pc=total>0?Math.min(100,Math.round(planted/total*100)):0;
-        return `<div style="display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid #f0ede6;gap:10px">
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:.85rem">${v}</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px">
-              <span class="tag">採${fmt(total)}</span><span class="tag am">植${fmt(planted)}</span><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span>
-            </div>
-          </div>
-          <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--sub)">${pc}%</div>
-        </div>`;
-      }).join('')}
-    </div>`;
+  rows.sort((a,b)=>{ if(stockSort==='no_asc')return a.no-b.no; if(stockSort==='no_desc')return b.no-a.no; if(stockSort==='variety')return allVarieties().indexOf(a.variety)-allVarieties().indexOf(b.variety); if(stockSort==='house')return a.house.localeCompare(b.house,'ja'); if(stockSort==='count')return b.count-a.count; if(stockSort==='rem_desc')return b.rem-a.rem; if(stockSort==='rem_asc')return a.rem-b.rem; return 0; });
+  el.innerHTML=`<div class="sort-bar"><span class="sort-lbl">並び：</span>${SSORTS.map(([k,l])=>`<button class="spill ${stockSort===k?'active':''}" onclick="stockSort='${k}';renderStock()">${l}</button>`).join('')}</div>${rows.map(r=>`<div class="scard"><div class="scard-row"><div class="scard-no">No.${r.no}</div><div class="scard-info" onclick="openCI(${r.no})" style="cursor:pointer"><div class="scard-variety">${r.variety}</div><div class="scard-meta"><span class="tag h">H${r.house}</span><span class="tag">${r.date}</span></div></div><div class="scard-right" onclick="openCI(${r.no})" style="cursor:pointer"><div class="scard-nums">採${fmt(r.count)} 植${fmt(r.planted)}</div><span class="rb ${rbCls(r.rem)}">${rbLbl(r.rem)}</span></div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${r.rem>0?`<button class="pbtn" style="font-size:.68rem;padding:5px 8px" onclick="openCI(${r.no})">🌾</button>`:''}<button class="ibtn" onclick="editNae(${r.no})">✏️</button></div></div></div>`).join('')}<div class="stitle">品種別まとめ</div><div style="background:var(--white);border-radius:12px;box-shadow:var(--sh);overflow:hidden">${allVarieties().filter(v=>naeTotalByVar(v)>0).map(v=>{ const total=naeTotalByVar(v),planted=naePlantedByVar(v),rem=total-planted,pc=total>0?Math.min(100,Math.round(planted/total*100)):0; return `<div style="display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid #f0ede6;gap:10px"><div style="flex:1"><div style="font-weight:600;font-size:.85rem">${v}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px"><span class="tag">採${fmt(total)}</span><span class="tag am">植${fmt(planted)}</span><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span></div></div><div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--sub)">${pc}%</div></div>`; }).join('')}</div>`;
 }
 
-// ═══════════════════════ NAE LIST ═══════════════════════
-let naeSort='no_asc', naeGroup='variety', naeSearch='';
+// ══════════ NAE LIST ══════════
+let naeSort='no_asc',naeGroup='variety',naeSearch='';
 const NAESORTS=[['no_asc','苗No↑'],['no_desc','苗No↓'],['variety','品種'],['count','箱数'],['rem','残り']];
 function renderNae(){
   const se=document.getElementById('nae-search');if(se)naeSearch=se.value.toLowerCase();
   const el=document.getElementById('page-nae');
   let data=naeData.filter(d=>!naeSearch||d.variety.toLowerCase().includes(naeSearch)||String(d.no).includes(naeSearch)||d.house.toLowerCase().includes(naeSearch));
-  data=[...data].sort((a,b)=>{
-    if(naeSort==='no_asc')  return a.no-b.no;
-    if(naeSort==='no_desc') return b.no-a.no;
-    if(naeSort==='variety') return allVarieties().indexOf(a.variety)-allVarieties().indexOf(b.variety);
-    if(naeSort==='count')   return b.count-a.count;
-    if(naeSort==='rem')     return remForNae(b.no)-remForNae(a.no);
-    return 0;
-  });
+  data=[...data].sort((a,b)=>{ if(naeSort==='no_asc')return a.no-b.no; if(naeSort==='no_desc')return b.no-a.no; if(naeSort==='variety')return allVarieties().indexOf(a.variety)-allVarieties().indexOf(b.variety); if(naeSort==='count')return b.count-a.count; if(naeSort==='rem')return remForNae(b.no)-remForNae(a.no); return 0; });
   let groups={};
   if(naeGroup==='house'){data.forEach(d=>{(groups[d.house]=groups[d.house]||[]).push(d);});}
   else if(naeGroup==='variety'){data.forEach(d=>{(groups[d.variety]=groups[d.variety]||[]).push(d);});}
   else{groups={'':data};}
-
-  // quick-add panel
   const autoNo=Math.max(0,...naeData.map(d=>d.no))+1;
-  const panel=`
-    <div class="nae-panel">
-      <div class="nae-panel-title">🌱 苗採りを追加</div>
-      <div class="nae-grid">
-        <div>
-          <span class="ni">苗No（空欄=自動）</span>
-          <input class="ninput" type="number" id="qa-no" placeholder="${autoNo}" min="1">
-        </div>
-        <div>
-          <span class="ni">日付</span>
-          <input class="ninput" type="date" id="qa-date" value="${todayStr()}">
-        </div>
-        <div>
-          <span class="ni">ハウスNo</span>
-          <input class="ninput" type="text" id="qa-house" placeholder="例:5" value="${hist.lastHouse}">
-          <div class="hpills" id="qa-hpills">
-            ${[...new Set(naeData.map(d=>d.house))].sort((a,b)=>isNaN(a)?1:isNaN(b)?-1:+a-+b).map(h=>`<button class="hpill${h===hist.lastHouse?' ap':''}" onclick="qaSetH('${h}')">${h}</button>`).join('')}
-          </div>
-        </div>
-        <div>
-          <span class="ni">箱数</span>
-          <input class="ninput" type="number" id="qa-count" placeholder="箱" step="0.5" min="0.5">
-        </div>
-        <div class="nae-full">
-          <span class="ni">品種</span>
-          <input class="ninput" type="text" id="qa-variety" placeholder="品種名" list="vlist" value="${hist.lastVariety}">
-          <div class="hpills" id="qa-vpills">
-            ${allVarieties().map(v=>`<button class="vpill${v===hist.lastVariety?' ap':''}" onclick="qaSetV('${v.replace(/'/g,"\\'")}')">${v}</button>`).join('')}
-          </div>
-        </div>
-      </div>
-      <button class="nae-save" onclick="qaSave()">🌱 苗採りを保存</button>
-    </div>`;
-
-  el.innerHTML=`
-    ${panel}
-    <div class="fbar"><input id="nae-search" type="text" placeholder="品種・苗No・ハウスで検索…" oninput="renderNae()" value="${naeSearch}"></div>
-    <div class="sort-bar">
-      <span class="sort-lbl">グループ：</span>
-      ${[['house','ハウス'],['variety','品種'],['none','なし']].map(([k,l])=>`<button class="spill ${naeGroup===k?'active':''}" onclick="naeGroup='${k}';renderNae()">${l}</button>`).join('')}
-      <span class="sort-lbl" style="margin-left:6px">並び：</span>
-      ${NAESORTS.map(([k,l])=>`<button class="spill ${naeSort===k?'active':''}" onclick="naeSort='${k}';renderNae()">${l}</button>`).join('')}
-    </div>
-    ${!data.length?'<div class="empty">🌱 該当なし</div>':''}
-    ${Object.entries(groups).map(([gk,items])=>`
-      ${naeGroup!=='none'&&gk?`<div class="stitle">${naeGroup==='house'?'🏡 H':'🌿'} ${gk}</div>`:''}
-      ${items.map(r=>{
-        const pl=plantedForNae(r.no),rem=r.count-pl;
-        const mpl=plantData.filter(p=>p.naeRef===r.no);
-        const over=daysSince(r.date)>=5&&rem>0;
-        return `<div class="ncard" ${over?'style="border-left:3px solid var(--am)"':''}>
-          <div class="ncard-head">
-            <div class="ncard-num"><span style="font-size:.5rem">苗No</span><span class="nno">${r.no}</span></div>
-            <div class="ncard-info" onclick="toggleP('np-${r.no}')">
-              <div class="ncard-variety">${r.variety}${over?` <span style="font-size:.65rem;color:var(--am)">⚠${daysSince(r.date)}日</span>`:''}</div>
-              <div class="ncard-meta">
-                <span class="tag">${r.date}</span><span class="tag h">H${r.house}</span>
-                ${mpl.length?`<span class="tag bl">植付${mpl.length}件 ▾</span>`:`<span class="tag">未植付</span>`}
-              </div>
-            </div>
-            <div class="ncard-right">
-              <span style="font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--g2)">${fmt(r.count)}箱</span>
-              <span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span>
-              <div style="display:flex;gap:3px">
-                ${rem>0?`<button class="ibtn" onclick="openCI(${r.no})">🌾</button>`:''}
-                <button class="ibtn" onclick="editNae(${r.no})">✏️</button>
-              </div>
-            </div>
-          </div>
-          <div class="ncard-plants" id="np-${r.no}">
-            ${!mpl.length?'<p class="no-plant">植え付け記録なし</p>':mpl.map(p=>`
-              <div class="prow">
-                <div class="prow-l">
-                  <span class="prow-field">📍${p.field}</span>
-                  <div class="prow-meta"><span class="tag">${p.date}</span><span class="tag am">植No.${plantNoLabel(p.id)}</span></div>
-                  ${p.note?`<div class="prow-note">${p.note}</div>`:''}
-                </div>
-                <div style="display:flex;align-items:center;gap:4px">
-                  <span class="prow-count">${fmt(p.count)}箱</span>
-                  <button class="ibtn" onclick="editPlant(${p.id})">✏️</button>
-                </div>
-              </div>`).join('')}
-          </div>
-        </div>`;}).join('')}
-    `).join('')}`;
+  const panel=`<div class="nae-panel"><div class="nae-panel-title">🌱 苗採りを追加</div><div class="nae-grid"><div><span class="ni">苗No（空欄=自動）</span><input class="ninput" type="number" id="qa-no" placeholder="${autoNo}" min="1"></div><div><span class="ni">日付</span><input class="ninput" type="date" id="qa-date" value="${todayStr()}"></div><div><span class="ni">ハウスNo</span><input class="ninput" type="text" id="qa-house" placeholder="例:5" value="${hist.lastHouse}"><div class="hpills" id="qa-hpills">${[...new Set(naeData.map(d=>d.house))].sort((a,b)=>isNaN(a)?1:isNaN(b)?-1:+a-+b).map(h=>`<button class="hpill${h===hist.lastHouse?' ap':''}" onclick="qaSetH('${h}')">${h}</button>`).join('')}</div></div><div><span class="ni">箱数</span><input class="ninput" type="number" id="qa-count" placeholder="箱" step="0.5" min="0.5"></div><div class="nae-full"><span class="ni">品種</span><input class="ninput" type="text" id="qa-variety" placeholder="品種名" list="vlist" value="${hist.lastVariety}"><div class="hpills" id="qa-vpills">${allVarieties().map(v=>`<button class="vpill${v===hist.lastVariety?' ap':''}" onclick="qaSetV('${v.replace(/'/g,"\\'")}')">  ${v}</button>`).join('')}</div></div></div><button class="nae-save" onclick="qaSave()">🌱 苗採りを保存</button></div>`;
+  el.innerHTML=`${panel}<div class="fbar"><input id="nae-search" type="text" placeholder="品種・苗No・ハウスで検索…" oninput="renderNae()" value="${naeSearch}"></div><div class="sort-bar"><span class="sort-lbl">グループ：</span>${[['house','ハウス'],['variety','品種'],['none','なし']].map(([k,l])=>`<button class="spill ${naeGroup===k?'active':''}" onclick="naeGroup='${k}';renderNae()">${l}</button>`).join('')}<span class="sort-lbl" style="margin-left:6px">並び：</span>${NAESORTS.map(([k,l])=>`<button class="spill ${naeSort===k?'active':''}" onclick="naeSort='${k}';renderNae()">${l}</button>`).join('')}</div>${!data.length?'<div class="empty">🌱 該当なし</div>':''}${Object.entries(groups).map(([gk,items])=>`${naeGroup!=='none'&&gk?`<div class="stitle">${naeGroup==='house'?'🏡 H':'🌿'} ${gk}</div>`:''} ${items.map(r=>{ const pl=plantedForNae(r.no),rem=r.count-pl,mpl=plantData.filter(p=>p.naeRef===r.no),over=daysSince(r.date)>=5&&rem>0; return `<div class="ncard" ${over?'style="border-left:3px solid var(--am)"':''}><div class="ncard-head"><div class="ncard-num"><span style="font-size:.5rem">苗No</span><span class="nno">${r.no}</span></div><div class="ncard-info" onclick="toggleP('np-${r.no}')"><div class="ncard-variety">${r.variety}${over?` <span style="font-size:.65rem;color:var(--am)">⚠${daysSince(r.date)}日</span>`:''}</div><div class="ncard-meta"><span class="tag">${r.date}</span><span class="tag h">H${r.house}</span>${mpl.length?`<span class="tag bl">植付${mpl.length}件 ▾</span>`:`<span class="tag">未植付</span>`}</div></div><div class="ncard-right"><span style="font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--g2)">${fmt(r.count)}箱</span><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span><div style="display:flex;gap:3px">${rem>0?`<button class="ibtn" onclick="openCI(${r.no})">🌾</button>`:''}<button class="ibtn" onclick="editNae(${r.no})">✏️</button></div></div></div><div class="ncard-plants" id="np-${r.no}">${!mpl.length?'<p class="no-plant">植え付け記録なし</p>':mpl.map(p=>`<div class="prow"><div class="prow-l"><span class="prow-field">📍${p.field}</span><div class="prow-meta"><span class="tag">${p.date}</span><span class="tag am">植No.${plantNoLabel(p.id)}</span></div>${p.note?`<div class="prow-note">${p.note}</div>`:''}</div><div style="display:flex;align-items:center;gap:4px"><span class="prow-count">${fmt(p.count)}箱</span><button class="ibtn" onclick="editPlant(${p.id})">✏️</button></div></div>`).join('')}</div></div>`; }).join('')}`).join('')}`;
   refreshVlist();
 }
 function toggleP(id){ const e=document.getElementById(id);if(e)e.classList.toggle('open'); }
-function qaSetH(h){ const e=document.getElementById('qa-house');if(e)e.value=h; hist.lastHouse=h; document.querySelectorAll('.hpill').forEach(p=>p.classList.toggle('ap',p.textContent===h)); }
-function qaSetV(v){ const e=document.getElementById('qa-variety');if(e)e.value=v; hist.lastVariety=v; document.querySelectorAll('.vpill').forEach(p=>p.classList.toggle('ap',p.textContent===v)); }
+function qaSetH(h){ const e=document.getElementById('qa-house');if(e)e.value=h; hist.lastHouse=h; document.querySelectorAll('.hpill').forEach(p=>p.classList.toggle('ap',p.textContent.trim()===h)); }
+function qaSetV(v){ const e=document.getElementById('qa-variety');if(e)e.value=v; hist.lastVariety=v; document.querySelectorAll('.vpill').forEach(p=>p.classList.toggle('ap',p.textContent.trim()===v)); }
 function qaSave(){
   const variety=(document.getElementById('qa-variety')||{value:''}).value.trim();
   const count=parseFloat((document.getElementById('qa-count')||{value:''}).value);
@@ -854,14 +727,14 @@ function qaSave(){
   if(naeData.find(d=>d.no===no)){toast(`⚠ 苗No.${no}はすでに存在します`);return;}
   naeData.push({no,date,house,variety,count});
   naeData.sort((a,b)=>a.no-b.no);
-  if(!varietyOrder.includes(variety)) varietyOrder.push(variety);
+  if(!varietyOrder.includes(variety))varietyOrder.push(variety);
   hist.lastHouse=house; hist.lastVariety=variety;
   toast(`✅ 苗No.${no}（${variety}）${fmt(count)}箱 を追加`);
   rerenderBg();
 }
 
-// ═══════════════════════ PLANT TAB ═══════════════════════
-let plSort='nae_asc', plSearch='';
+// ══════════ PLANT TAB ══════════
+let plSort='nae_asc',plSearch='';
 const PLSORTS=[['nae_asc','苗No↑'],['nae_desc','苗No↓'],['date','日付'],['count','箱数多']];
 function renderPlant(){
   const se=document.getElementById('pl-search');if(se)plSearch=se.value.toLowerCase();
@@ -869,686 +742,97 @@ function renderPlant(){
   const groups={};
   plantData.forEach(p=>{const k=p.naeRef!=null?String(p.naeRef):'?';(groups[k]=groups[k]||[]).push(p);});
   let keys=Object.keys(groups);
-  keys.sort((a,b)=>{
-    if(plSort==='nae_asc')  return (+a||999)-(+b||999);
-    if(plSort==='nae_desc') return (+b||999)-(+a||999);
-    if(plSort==='date')     return (groups[a][0]?.date||'').localeCompare(groups[b][0]?.date||'');
-    if(plSort==='count')    return groups[b].reduce((s,p)=>s+p.count,0)-groups[a].reduce((s,p)=>s+p.count,0);
-    return 0;
-  });
+  keys.sort((a,b)=>{ if(plSort==='nae_asc')return (+a||999)-(+b||999); if(plSort==='nae_desc')return (+b||999)-(+a||999); if(plSort==='date')return (groups[a][0]?.date||'').localeCompare(groups[b][0]?.date||''); if(plSort==='count')return groups[b].reduce((s,p)=>s+p.count,0)-groups[a].reduce((s,p)=>s+p.count,0); return 0; });
   const filtered=keys.filter(k=>groups[k].some(p=>!plSearch||p.field.toLowerCase().includes(plSearch)||(p.note||'').toLowerCase().includes(plSearch)));
-  el.innerHTML=`
-    <div class="fbar"><input id="pl-search" type="text" placeholder="畑名・備考で検索…" oninput="renderPlant()" value="${plSearch}"></div>
-    <div class="sort-bar"><span class="sort-lbl">並び：</span>${PLSORTS.map(([k,l])=>`<button class="spill ${plSort===k?'active':''}" onclick="plSort='${k}';renderPlant()">${l}</button>`).join('')}</div>
-    ${filtered.map(k=>{
-      const rows=groups[k].filter(p=>!plSearch||p.field.toLowerCase().includes(plSearch)||(p.note||'').toLowerCase().includes(plSearch));
-      if(!rows.length)return '';
-      const nae=k!=='?'?naeData.find(n=>n.no===+k):null;
-      const total=rows.reduce((s,p)=>s+p.count,0);
-      const rem=nae?remForNae(nae.no):null;
-      const head=nae?`苗No.${nae.no}（${nae.variety}/H${nae.house}）`:`グループ${k}`;
-      return `<div class="plant-no-card">
-        <div class="plant-no-head">
-          <span>🌾 ${head}</span>
-          <div style="display:flex;align-items:center;gap:7px">
-            <span style="font-family:'Space Mono',monospace">${fmt(total)}箱</span>
-            ${rem!=null?`<span class="rb ${rbCls(rem)}" style="font-size:.62rem">${rbLbl(rem)}</span>`:''}
-            ${rem>0?`<button class="pbtn" style="font-size:.67rem;padding:4px 8px" onclick="openCI(${nae.no})">🌾追加</button>`:''}
-          </div>
-        </div>
-        ${rows.map(p=>`<div class="plant-row">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <span class="tag am" style="font-family:'Space Mono',monospace;font-weight:700">植${plantNoLabel(p.id)}</span>
-              <span style="font-weight:700">📍${p.field}</span>
-              <span class="tag">${p.date}</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:4px">
-              <span style="font-family:'Space Mono',monospace;font-weight:700;color:var(--am)">${fmt(p.count)}箱</span>
-              <button class="ibtn" onclick="editPlant(${p.id})">✏️</button>
-              <button class="ibtn del" onclick="delPlant(${p.id})">🗑️</button>
-            </div>
-          </div>
-          ${p.note?`<div style="font-size:.66rem;color:var(--sub);margin-top:3px;font-style:italic">${p.note}</div>`:''}
-        </div>`).join('')}
-      </div>`;
-    }).join('')}`;
+  el.innerHTML=`<div class="fbar"><input id="pl-search" type="text" placeholder="畑名・備考で検索…" oninput="renderPlant()" value="${plSearch}"></div><div class="sort-bar"><span class="sort-lbl">並び：</span>${PLSORTS.map(([k,l])=>`<button class="spill ${plSort===k?'active':''}" onclick="plSort='${k}';renderPlant()">${l}</button>`).join('')}</div>${filtered.map(k=>{ const rows=groups[k].filter(p=>!plSearch||p.field.toLowerCase().includes(plSearch)||(p.note||'').toLowerCase().includes(plSearch)); if(!rows.length)return ''; const nae=k!=='?'?naeData.find(n=>n.no===+k):null; const total=rows.reduce((s,p)=>s+p.count,0),rem=nae?remForNae(nae.no):null,head=nae?`苗No.${nae.no}（${nae.variety}/H${nae.house}）`:`グループ${k}`; return `<div class="plant-no-card"><div class="plant-no-head"><span>🌾 ${head}</span><div style="display:flex;align-items:center;gap:7px"><span style="font-family:'Space Mono',monospace">${fmt(total)}箱</span>${rem!=null?`<span class="rb ${rbCls(rem)}" style="font-size:.62rem">${rbLbl(rem)}</span>`:''} ${rem>0?`<button class="pbtn" style="font-size:.67rem;padding:4px 8px" onclick="openCI(${nae.no})">🌾追加</button>`:''}</div></div>${rows.map(p=>`<div class="plant-row"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="tag am" style="font-family:'Space Mono',monospace;font-weight:700">植${plantNoLabel(p.id)}</span><span style="font-weight:700">📍${p.field}</span><span class="tag">${p.date}</span></div><div style="display:flex;align-items:center;gap:4px"><span style="font-family:'Space Mono',monospace;font-weight:700;color:var(--am)">${fmt(p.count)}箱</span><button class="ibtn" onclick="editPlant(${p.id})">✏️</button><button class="ibtn del" onclick="delPlant(${p.id})">🗑️</button></div></div>${p.note?`<div style="font-size:.66rem;color:var(--sub);margin-top:3px;font-style:italic">${p.note}</div>`:''}</div>`).join('')}</div>`; }).join('')}`;
 }
 
-// ═══════════════════════ FIELD TAB ═══════════════════════
-let fieldSort='count', fieldSearch='';
+// ══════════ FIELD TAB ══════════
+let fieldSort='count',fieldSearch='';
 function renderField(){
   const se=document.getElementById('field-search');if(se)fieldSearch=se.value.toLowerCase();
   const el=document.getElementById('page-field');
   const groups={};
   plantData.forEach(p=>{(groups[p.field]=groups[p.field]||[]).push(p);});
   let fields=allFields().filter(f=>!fieldSearch||f.toLowerCase().includes(fieldSearch));
-  fields.sort((a,b)=>{
-    if(fieldSort==='name')  return a.localeCompare(b,'ja');
-    if(fieldSort==='count') return (groups[b]||[]).reduce((s,p)=>s+p.count,0)-(groups[a]||[]).reduce((s,p)=>s+p.count,0);
-    if(fieldSort==='date'){
-      const da=(groups[a]||[]).slice(-1)[0]?.date||'';
-      const db=(groups[b]||[]).slice(-1)[0]?.date||'';
-      return db.localeCompare(da);
-    }
-    return 0;
-  });
-  el.innerHTML=`
-    <div class="fbar"><input id="field-search" type="text" placeholder="畑名で検索…" oninput="renderField()" value="${fieldSearch}"></div>
-    <div class="sort-bar"><span class="sort-lbl">並び：</span>
-      ${[['count','箱数多'],['name','畑名'],['date','最新']].map(([k,l])=>`<button class="spill ${fieldSort===k?'active':''}" onclick="fieldSort='${k}';renderField()">${l}</button>`).join('')}
-    </div>
-    ${!fields.length?'<div class="empty">📍 該当なし</div>':''}
-    ${fields.map(f=>{
-      const rows=groups[f]||[];
-      const total=rows.reduce((s,p)=>s+p.count,0);
-      const fm=fieldMaster.find(m=>m.name===f);
-      const fid='fc_'+esc(f);
-      return `<div class="fcard">
-        <div class="fcard-head" onclick="toggleFC('${fid}')">
-          <div>
-            <span>📍 ${f}</span>
-            ${fm?.note?`<div style="font-size:.65rem;opacity:.8;margin-top:2px">${fm.note}</div>`:''}
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${rows.length?`<span style="font-family:'Space Mono',monospace">${fmt(total)}箱</span>`:'<span style="font-size:.7rem;opacity:.7">記録なし</span>'}
-            <span style="font-size:.82rem">▾</span>
-          </div>
-        </div>
-        <div class="fcard-body" id="${fid}">
-          ${!rows.length?'<div class="no-plant">植え付け記録なし</div>':rows.map(p=>{
-            const nae=p.naeRef!=null?naeData.find(n=>n.no===p.naeRef):null;
-            return `<div class="fcard-row">
-              <div style="flex:1">
-                <div style="font-weight:600;font-size:.83rem">${fmt(p.count)}箱 <span style="font-weight:400;color:var(--sub)">— ${p.date}</span></div>
-                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:3px">
-                  ${nae?`<span class="tag h">苗No.${nae.no} ${nae.variety}</span>`:''}
-                  <span class="tag am">植${plantNoLabel(p.id)}</span>
-                  ${p.note?`<span class="tag">${p.note}</span>`:''}
-                </div>
-              </div>
-              <div style="display:flex;gap:4px">
-                <button class="ibtn" onclick="editPlant(${p.id})">✏️</button>
-                <button class="ibtn del" onclick="delPlant(${p.id})">🗑️</button>
-              </div>
-            </div>`;
-          }).join('')}
-          ${rows.length?`<div style="padding:7px 13px;background:var(--g5);font-size:.76rem;color:var(--g2);font-weight:600">合計${fmt(total)}箱 ／ ${rows.length}回</div>`:''}
-        </div>
-      </div>`;
-    }).join('')}`;
+  fields.sort((a,b)=>{ if(fieldSort==='name')return a.localeCompare(b,'ja'); if(fieldSort==='count')return (groups[b]||[]).reduce((s,p)=>s+p.count,0)-(groups[a]||[]).reduce((s,p)=>s+p.count,0); if(fieldSort==='date'){return ((groups[b]||[]).slice(-1)[0]?.date||'').localeCompare(((groups[a]||[]).slice(-1)[0]?.date||''));} return 0; });
+  el.innerHTML=`<div class="fbar"><input id="field-search" type="text" placeholder="畑名で検索…" oninput="renderField()" value="${fieldSearch}"></div><div class="sort-bar"><span class="sort-lbl">並び：</span>${[['count','箱数多'],['name','畑名'],['date','最新']].map(([k,l])=>`<button class="spill ${fieldSort===k?'active':''}" onclick="fieldSort='${k}';renderField()">${l}</button>`).join('')}</div>${!fields.length?'<div class="empty">📍 該当なし</div>':''}${fields.map(f=>{ const rows=groups[f]||[],total=rows.reduce((s,p)=>s+p.count,0),fm=fieldMaster.find(m=>m.name===f),fid='fc_'+esc(f); return `<div class="fcard"><div class="fcard-head" onclick="toggleFC('${fid}')"><div><span>📍 ${f}</span>${fm?.note?`<div style="font-size:.65rem;opacity:.8;margin-top:2px">${fm.note}</div>`:''}</div><div style="display:flex;align-items:center;gap:8px">${rows.length?`<span style="font-family:'Space Mono',monospace">${fmt(total)}箱</span>`:'<span style="font-size:.7rem;opacity:.7">記録なし</span>'}<span>▾</span></div></div><div class="fcard-body" id="${fid}">${!rows.length?'<div class="no-plant">植え付け記録なし</div>':rows.map(p=>{ const nae=p.naeRef!=null?naeData.find(n=>n.no===p.naeRef):null; return `<div class="fcard-row"><div style="flex:1"><div style="font-weight:600;font-size:.83rem">${fmt(p.count)}箱 <span style="font-weight:400;color:var(--sub)">— ${p.date}</span></div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:3px">${nae?`<span class="tag h">苗No.${nae.no} ${nae.variety}</span>`:''}<span class="tag am">植${plantNoLabel(p.id)}</span>${p.note?`<span class="tag">${p.note}</span>`:''}</div></div><div style="display:flex;gap:4px"><button class="ibtn" onclick="editPlant(${p.id})">✏️</button><button class="ibtn del" onclick="delPlant(${p.id})">🗑️</button></div></div>`; }).join('')}${rows.length?`<div style="padding:7px 13px;background:var(--g5);font-size:.76rem;color:var(--g2);font-weight:600">合計${fmt(total)}箱 ／ ${rows.length}回</div>`:''}</div></div>`; }).join('')}`;
 }
 function toggleFC(id){ const b=document.getElementById(id);if(b)b.classList.toggle('open'); }
 
-// ═══════════════════════ SETTINGS ═══════════════════════
+// ══════════ SETTINGS ══════════
 let settingsTab='variety';
 function renderSettings(){
   const el=document.getElementById('page-settings');
   const stabs=[['variety','🌿 品種'],['fieldMaster','📍 畑'],['naeList','🌱 苗No'],['plantList','🌾 植付']];
   let body='';
-
   if(settingsTab==='variety'){
-    body=`
-      <div class="set-section">
-        <div class="set-head">品種マスタ — 並び替え・名前変更 <button class="set-head-btn" onclick="saveVarOrder()">✅ 保存</button></div>
-        <div id="var-list">
-          ${varietyOrder.map((v,i)=>`
-            <div class="ed-row" draggable="true"
-              ondragstart="vDragStart(event,${i})" ondragover="event.preventDefault();this.classList.add('drag-over')"
-              ondragleave="this.classList.remove('drag-over')" ondrop="vDrop(event,${i})">
-              <span class="drag-h">⠿</span>
-              <input class="ed-inp" id="vi-${i}" value="${v}" placeholder="品種名">
-              <button class="ibtn" onclick="moveV(${i},-1)">↑</button>
-              <button class="ibtn" onclick="moveV(${i},1)">↓</button>
-              <button class="ibtn del" onclick="removeV(${i})">🗑️</button>
-            </div>`).join('')}
-        </div>
-        <div class="add-row">
-          <input class="add-inp" id="new-var" placeholder="新しい品種名">
-          <button class="add-btn" onclick="addV()">追加</button>
-        </div>
-      </div>`;
+    body=`<div class="set-section"><div class="set-head">品種マスタ — 並び替え・名前変更 <button class="set-head-btn" onclick="saveVarOrder()">✅ 保存</button></div><div id="var-list">${varietyOrder.map((v,i)=>`<div class="ed-row" draggable="true" ondragstart="vDS(event,${i})" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="vDrop(event,${i})"><span class="drag-h">⠿</span><input class="ed-inp" id="vi-${i}" value="${v}" placeholder="品種名"><button class="ibtn" onclick="moveV(${i},-1)">↑</button><button class="ibtn" onclick="moveV(${i},1)">↓</button><button class="ibtn del" onclick="removeV(${i})">🗑️</button></div>`).join('')}</div><div class="add-row"><input class="add-inp" id="new-var" placeholder="新しい品種名"><button class="add-btn" onclick="addV()">追加</button></div></div>`;
+  } else if(settingsTab==='fieldMaster'){
+    body=`<div class="set-section"><div class="set-head">畑マスタ — 並び替え・名前変更・メモ <button class="set-head-btn" onclick="saveFdMaster()">✅ 保存</button></div><div id="field-list">${fieldMaster.map((f,i)=>`<div class="ed-row" draggable="true" ondragstart="fdDS(event,${i})" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="fdDrop(event,${i})"><span class="drag-h">⠿</span><div style="flex:1;display:flex;flex-direction:column;gap:4px"><input class="ed-inp" id="fn-${i}" value="${f.name}" placeholder="畑名"><input class="ed-inp sub-inp" id="fm-${i}" value="${f.note||''}" placeholder="メモ（任意）"></div><button class="ibtn" onclick="moveFd(${i},-1)">↑</button><button class="ibtn" onclick="moveFd(${i},1)">↓</button><button class="ibtn del" onclick="removeFd(${i})">🗑️</button></div>`).join('')}</div><div class="add-row"><input class="add-inp" id="new-field" placeholder="新しい畑名"><button class="add-btn" style="background:var(--pu)" onclick="addFd()">追加</button></div></div><div style="background:var(--pu2);border-radius:10px;padding:9px 13px;font-size:.73rem;color:#4c1d95">💡 名前変更すると植え付け記録も自動で更新されます</div>`;
+  } else if(settingsTab==='naeList'){
+    body=`<div class="set-section"><div class="set-head">苗No一覧 — ${naeData.length}件</div>${naeData.map(r=>`<div class="set-row"><div class="set-ri"><div class="set-rl">No.${r.no}　${r.variety}</div><div class="set-rs">H${r.house} ／ ${r.date} ／ ${fmt(r.count)}箱 ／ 残${fmt(remForNae(r.no))}箱</div></div><button class="ibtn" onclick="editNae(${r.no})">✏️</button></div>`).join('')}</div>`;
+  } else if(settingsTab==='plantList'){
+    body=`<div class="set-section"><div class="set-head">植付一覧 — ${plantData.length}件</div>${plantData.map(p=>{ const nae=p.naeRef!=null?naeData.find(n=>n.no===p.naeRef):null; return `<div class="set-row"><div class="set-ri"><div class="set-rl">植${plantNoLabel(p.id)}　📍${p.field}　${fmt(p.count)}箱</div><div class="set-rs">${p.date}${nae?' ／ 苗No.'+nae.no+' '+nae.variety:''}${p.note?' ／ '+p.note:''}</div></div><div style="display:flex;gap:4px"><button class="ibtn" onclick="editPlant(${p.id})">✏️</button><button class="ibtn del" onclick="delPlant(${p.id})">🗑️</button></div></div>`; }).join('')}</div>`;
   }
-  else if(settingsTab==='fieldMaster'){
-    body=`
-      <div class="set-section">
-        <div class="set-head">畑マスタ — 並び替え・名前変更・メモ <button class="set-head-btn" onclick="saveFdMaster()">✅ 保存</button></div>
-        <div id="field-list">
-          ${fieldMaster.map((f,i)=>`
-            <div class="ed-row" draggable="true"
-              ondragstart="fdDragStart(event,${i})" ondragover="event.preventDefault();this.classList.add('drag-over')"
-              ondragleave="this.classList.remove('drag-over')" ondrop="fdDrop(event,${i})">
-              <span class="drag-h">⠿</span>
-              <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-                <input class="ed-inp" id="fn-${i}" value="${f.name}" placeholder="畑名">
-                <input class="ed-inp sub-inp" id="fm-${i}" value="${f.note||''}" placeholder="メモ（任意）">
-              </div>
-              <button class="ibtn" onclick="moveFd(${i},-1)">↑</button>
-              <button class="ibtn" onclick="moveFd(${i},1)">↓</button>
-              <button class="ibtn del" onclick="removeFd(${i})">🗑️</button>
-            </div>`).join('')}
-        </div>
-        <div class="add-row">
-          <input class="add-inp" id="new-field" placeholder="新しい畑名">
-          <button class="add-btn" style="background:var(--pu)" onclick="addFd()">追加</button>
-        </div>
-      </div>
-      <div style="background:var(--pu2);border-radius:10px;padding:9px 13px;font-size:.73rem;color:#4c1d95">
-        💡 名前変更すると植え付け記録も自動で更新されます
-      </div>`;
-  }
-  else if(settingsTab==='naeList'){
-    body=`
-      <div class="set-section">
-        <div class="set-head">苗No一覧 — ${naeData.length}件</div>
-        ${naeData.map(r=>`
-          <div class="set-row">
-            <div class="set-ri">
-              <div class="set-rl">No.${r.no}　${r.variety}</div>
-              <div class="set-rs">H${r.house} ／ ${r.date} ／ ${fmt(r.count)}箱 ／ 残${fmt(remForNae(r.no))}箱</div>
-            </div>
-            <button class="ibtn" onclick="editNae(${r.no})">✏️</button>
-          </div>`).join('')}
-      </div>`;
-  }
-  else if(settingsTab==='plantList'){
-    body=`
-      <div class="set-section">
-        <div class="set-head">植付一覧 — ${plantData.length}件</div>
-        ${plantData.map(p=>{
-          const nae=p.naeRef!=null?naeData.find(n=>n.no===p.naeRef):null;
-          return `<div class="set-row">
-            <div class="set-ri">
-              <div class="set-rl">植${plantNoLabel(p.id)}　📍${p.field}　${fmt(p.count)}箱</div>
-              <div class="set-rs">${p.date}${nae?' ／ 苗No.'+nae.no+' '+nae.variety:''}${p.note?' ／ '+p.note:''}</div>
-            </div>
-            <div style="display:flex;gap:4px">
-              <button class="ibtn" onclick="editPlant(${p.id})">✏️</button>
-              <button class="ibtn del" onclick="delPlant(${p.id})">🗑️</button>
-            </div>
-          </div>`;}).join('')}
-      </div>`;
-  }
-
-  el.innerHTML=`
-    <div class="set-tabs">
-      ${stabs.map(([k,l])=>`<div class="set-tab ${settingsTab===k?'active':''}" onclick="settingsTab='${k}';renderSettings()">${l}</div>`).join('')}
-    </div>
-    ${body}`;
+  el.innerHTML=`<div class="set-tabs">${stabs.map(([k,l])=>`<div class="set-tab ${settingsTab===k?'active':''}" onclick="settingsTab='${k}';renderSettings()">${l}</div>`).join('')}</div>${body}`;
 }
 
-// ── Variety editor ──
-let vDragIdx=null;
-function getVarList(){ return [...(document.querySelectorAll('[id^="vi-"]'))].map(el=>el.value.trim()).filter(Boolean); }
-function vDragStart(e,i){ vDragIdx=i; }
-function vDrop(e,i){
-  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-  if(vDragIdx===null||vDragIdx===i)return;
-  const v=getVarList(); const [m]=v.splice(vDragIdx,1); v.splice(i,0,m);
-  varietyOrder=[...v]; vDragIdx=null; renderSettings();
-}
-function saveVarOrder(){
-  const v=getVarList(); if(!v.length){toast('⚠ 品種が空です');return;}
-  // 名前変更反映
-  varietyOrder.forEach((ov,i)=>{ const nv=v[i]; if(nv&&nv!==ov) naeData.forEach(n=>{if(n.variety===ov)n.variety=nv;}); });
-  varietyOrder=[...v]; toast('✅ 品種を保存しました'); rerenderBg();
-}
-function moveV(i,dir){
-  const v=getVarList(); const j=i+dir; if(j<0||j>=v.length)return;
-  [v[i],v[j]]=[v[j],v[i]]; varietyOrder=[...v]; renderSettings();
-}
-function addV(){
-  const inp=document.getElementById('new-var');if(!inp)return;
-  const name=inp.value.trim(); if(!name){toast('⚠ 品種名を入力');return;}
-  const cur=getVarList(); if(cur.includes(name)){toast('⚠ すでに存在します');return;}
-  varietyOrder=[...cur,name]; inp.value=''; renderSettings(); toast(`✅「${name}」を追加`);
-}
-function removeV(i){
-  const v=getVarList(); const name=v[i];
-  if(naeData.some(n=>n.variety===name)){toast(`⚠「${name}」は苗データで使用中`);return;}
-  if(!confirm(`「${name}」を削除しますか？`))return;
-  varietyOrder=v.filter((_,j)=>j!==i); renderSettings(); toast(`「${name}」を削除しました`);
-}
+// variety editor
+let vDI=null;
+function getVarList(){ return [...document.querySelectorAll('[id^="vi-"]')].map(e=>e.value.trim()).filter(Boolean); }
+function vDS(e,i){ vDI=i; }
+function vDrop(e,i){ e.preventDefault();e.currentTarget.classList.remove('drag-over'); if(vDI===null||vDI===i)return; const v=getVarList();const[m]=v.splice(vDI,1);v.splice(i,0,m);varietyOrder=[...v];vDI=null;renderSettings(); }
+function saveVarOrder(){ const v=getVarList();if(!v.length){toast('⚠ 品種が空です');return;} varietyOrder.forEach((ov,i)=>{ const nv=v[i];if(nv&&nv!==ov)naeData.forEach(n=>{if(n.variety===ov)n.variety=nv;}); }); varietyOrder=[...v]; toast('✅ 品種を保存しました'); rerenderBg(); }
+function moveV(i,dir){ const v=getVarList();const j=i+dir;if(j<0||j>=v.length)return;[v[i],v[j]]=[v[j],v[i]];varietyOrder=[...v];renderSettings(); }
+function addV(){ const inp=document.getElementById('new-var');if(!inp)return; const name=inp.value.trim();if(!name){toast('⚠ 品種名を入力');return;} const cur=getVarList();if(cur.includes(name)){toast('⚠ すでに存在します');return;} varietyOrder=[...cur,name];inp.value='';renderSettings();toast(`✅「${name}」を追加`); }
+function removeV(i){ const v=getVarList();const name=v[i];if(naeData.some(n=>n.variety===name)){toast(`⚠「${name}」は使用中`);return;} if(!confirm(`「${name}」を削除しますか？`))return; varietyOrder=v.filter((_,j)=>j!==i);renderSettings();toast(`削除しました`); }
 
-// ── Field master editor ──
-let fdDragIdx=null;
-function getFdList(){ return [...(document.querySelectorAll('[id^="fn-"]'))].map((el,i)=>({name:el.value.trim(),note:(document.getElementById('fm-'+i)||{value:''}).value.trim()})).filter(f=>f.name); }
-function fdDragStart(e,i){ fdDragIdx=i; }
-function fdDrop(e,i){
-  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-  if(fdDragIdx===null||fdDragIdx===i)return;
-  const fds=getFdList(); const [m]=fds.splice(fdDragIdx,1); fds.splice(i,0,m);
-  fieldMaster=[...fds]; fdDragIdx=null; renderSettings();
-}
-function saveFdMaster(){
-  const fds=getFdList(); if(!fds.length){toast('⚠ 畑が空です');return;}
-  fieldMaster.forEach((old,i)=>{
-    const nw=fds[i]; if(nw&&nw.name&&nw.name!==old.name){
-      plantData.forEach(p=>{if(p.field===old.name)p.field=nw.name;});
-      hist.fields=hist.fields.map(f=>f===old.name?nw.name:f);
-      if(hist.lastField===old.name)hist.lastField=nw.name;
-    }
-  });
-  fieldMaster=[...fds]; toast('✅ 畑マスタを保存しました'); rerenderBg();
-}
-function moveFd(i,dir){
-  const fds=getFdList(); const j=i+dir; if(j<0||j>=fds.length)return;
-  [fds[i],fds[j]]=[fds[j],fds[i]]; fieldMaster=[...fds]; renderSettings();
-}
-function addFd(){
-  const inp=document.getElementById('new-field');if(!inp)return;
-  const name=inp.value.trim(); if(!name){toast('⚠ 畑名を入力');return;}
-  const cur=getFdList(); if(cur.some(f=>f.name===name)){toast('⚠ すでに存在します');return;}
-  fieldMaster=[...cur,{name,note:''}]; inp.value=''; renderSettings(); toast(`✅「${name}」を追加`); refreshFlists();
-}
-function removeFd(i){
-  const fds=getFdList(); const f=fds[i];
-  const used=plantData.some(p=>p.field===f.name);
-  if(!confirm(`「${f.name}」を${used?'（植え付けデータあり）':''}削除しますか？`))return;
-  fieldMaster=fds.filter((_,j)=>j!==i); renderSettings(); toast(`「${f.name}」を削除`); refreshFlists();
-}
+// field master editor
+let fdDI=null;
+function getFdList(){ return [...document.querySelectorAll('[id^="fn-"]')].map((e,i)=>({name:e.value.trim(),note:(document.getElementById('fm-'+i)||{value:''}).value.trim()})).filter(f=>f.name); }
+function fdDS(e,i){ fdDI=i; }
+function fdDrop(e,i){ e.preventDefault();e.currentTarget.classList.remove('drag-over'); if(fdDI===null||fdDI===i)return; const f=getFdList();const[m]=f.splice(fdDI,1);f.splice(i,0,m);fieldMaster=[...f];fdDI=null;renderSettings(); }
+function saveFdMaster(){ const fds=getFdList();if(!fds.length){toast('⚠ 畑が空です');return;} fieldMaster.forEach((old,i)=>{ const nw=fds[i];if(nw&&nw.name&&nw.name!==old.name){ plantData.forEach(p=>{if(p.field===old.name)p.field=nw.name;}); hist.fields=hist.fields.map(f=>f===old.name?nw.name:f); if(hist.lastField===old.name)hist.lastField=nw.name; } }); fieldMaster=[...fds];toast('✅ 畑マスタを保存しました');rerenderBg(); }
+function moveFd(i,dir){ const f=getFdList();const j=i+dir;if(j<0||j>=f.length)return;[f[i],f[j]]=[f[j],f[i]];fieldMaster=[...f];renderSettings(); }
+function addFd(){ const inp=document.getElementById('new-field');if(!inp)return; const name=inp.value.trim();if(!name){toast('⚠ 畑名を入力');return;} const cur=getFdList();if(cur.some(f=>f.name===name)){toast('⚠ すでに存在します');return;} fieldMaster=[...cur,{name,note:''}];inp.value='';renderSettings();toast(`✅「${name}」を追加`);refreshFlists(); }
+function removeFd(i){ const f=getFdList();const fd=f[i];if(!confirm(`「${fd.name}」を削除しますか？`))return; fieldMaster=f.filter((_,j)=>j!==i);renderSettings();toast(`削除しました`);refreshFlists(); }
 
-// ═══════════════════════ TABS ═══════════════════════
+// ══════════ TABS ══════════
 const pageMap={dash:'page-dash',stock:'page-stock',nae:'page-nae',plant:'page-plant',field:'page-field',settings:'page-settings'};
 const renderMap={dash:renderDash,stock:renderStock,nae:renderNae,plant:renderPlant,field:renderField,settings:renderSettings};
 const tabKeys=['dash','stock','nae','plant','field','settings'];
-function sw(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabKeys[i]===tab));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(pageMap[tab]).classList.add('active');
-  renderMap[tab]();
-}
+function sw(tab){ document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabKeys[i]===tab)); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(pageMap[tab]).classList.add('active'); renderMap[tab](); }
 
-// ═══════════════════════ EDIT MODAL ═══════════════════════
+// ══════════ EDIT MODAL ══════════
 let editMode=null;
-function editNae(no){
-  const r=naeData.find(d=>d.no===no);if(!r)return;
-  editMode={type:'nae',no};
-  document.getElementById('m-typewrap').style.display='none';
-  document.getElementById('m-type').value='nae';mtype();
-  document.getElementById('m-title').textContent=`✏️ 苗No.${no} を編集`;
-  document.getElementById('m-naeno').value=r.no;
-  document.getElementById('m-house').value=r.house;
-  document.getElementById('m-variety').value=r.variety;
-  document.getElementById('m-count').value=r.count;
-  document.getElementById('m-note').value='';
-  document.getElementById('m-delbtn').style.display='block';
-  refreshVlist(); document.getElementById('ov').classList.add('open');
-}
-function editPlant(id){
-  const p=plantData.find(d=>d.id===id);if(!p)return;
-  editMode={type:'plant',id};
-  document.getElementById('m-typewrap').style.display='none';
-  document.getElementById('m-type').value='plant';mtype();
-  document.getElementById('m-title').textContent=`✏️ 植No.${plantNoLabel(id)} を編集`;
-  document.getElementById('m-pdate').value='';
-  document.getElementById('m-field').value=p.field;
-  document.getElementById('m-pcount').value=p.count;
-  document.getElementById('m-note').value=p.note||'';
-  const sel=document.getElementById('m-refnae');
-  sel.innerHTML='<option value="">— 選択 —</option>'+naeData.map(n=>`<option value="${n.no}" ${p.naeRef===n.no?'selected':''}>No.${n.no} ${n.variety}（H${n.house}）</option>`).join('');
-  document.getElementById('m-delbtn').style.display='block';
-  refreshFlists(); document.getElementById('ov').classList.add('open');
-}
-function delPlant(id){
-  if(!confirm('この植え付け記録を削除しますか？'))return;
-  plantData=plantData.filter(p=>p.id!==id); toast('削除しました'); rerenderBg();
-}
-function delRec(){
-  if(!editMode)return;
-  if(editMode.type==='nae'){
-    const r=naeData.find(d=>d.no===editMode.no);
-    if(!confirm(`苗No.${editMode.no}（${r?.variety}）を削除しますか？`))return;
-    plantData.forEach(p=>{if(p.naeRef===editMode.no)p.naeRef=null;});
-    naeData=naeData.filter(d=>d.no!==editMode.no);
-    toast(`苗No.${editMode.no} を削除`);
-  } else {
-    if(!confirm('削除しますか？'))return;
-    plantData=plantData.filter(p=>p.id!==editMode.id);
-    toast('削除しました');
-  }
-  closeModal(); rerenderBg();
-}
+function editNae(no){ const r=naeData.find(d=>d.no===no);if(!r)return; editMode={type:'nae',no}; document.getElementById('m-typewrap').style.display='none'; document.getElementById('m-type').value='nae';mtype(); document.getElementById('m-title').textContent=`✏️ 苗No.${no} を編集`; document.getElementById('m-naeno').value=r.no; document.getElementById('m-house').value=r.house; document.getElementById('m-variety').value=r.variety; document.getElementById('m-count').value=r.count; document.getElementById('m-note').value=''; document.getElementById('m-delbtn').style.display='block'; refreshVlist(); document.getElementById('ov').classList.add('open'); }
+function editPlant(id){ const p=plantData.find(d=>d.id===id);if(!p)return; editMode={type:'plant',id}; document.getElementById('m-typewrap').style.display='none'; document.getElementById('m-type').value='plant';mtype(); document.getElementById('m-title').textContent=`✏️ 植No.${plantNoLabel(id)} を編集`; document.getElementById('m-pdate').value=''; document.getElementById('m-field').value=p.field; document.getElementById('m-pcount').value=p.count; document.getElementById('m-note').value=p.note||''; const sel=document.getElementById('m-refnae'); sel.innerHTML='<option value="">— 選択 —</option>'+naeData.map(n=>`<option value="${n.no}" ${p.naeRef===n.no?'selected':''}>No.${n.no} ${n.variety}（H${n.house}）</option>`).join(''); document.getElementById('m-delbtn').style.display='block'; refreshFlists(); document.getElementById('ov').classList.add('open'); }
+function delPlant(id){ if(!confirm('この植え付け記録を削除しますか？'))return; plantData=plantData.filter(p=>p.id!==id); toast('削除しました'); rerenderBg(); }
+function delRec(){ if(!editMode)return; if(editMode.type==='nae'){ const r=naeData.find(d=>d.no===editMode.no); if(!confirm(`苗No.${editMode.no}（${r?.variety}）を削除しますか？`))return; plantData.forEach(p=>{if(p.naeRef===editMode.no)p.naeRef=null;}); naeData=naeData.filter(d=>d.no!==editMode.no); toast(`苗No.${editMode.no} を削除`); } else { if(!confirm('削除しますか？'))return; plantData=plantData.filter(p=>p.id!==editMode.id); toast('削除しました'); } closeModal(); rerenderBg(); }
 
-// ═══════════════════════ ADD MODAL ═══════════════════════
-function openModal(){
-  editMode=null;
-  document.getElementById('m-typewrap').style.display='block';
-  document.getElementById('m-delbtn').style.display='none';
-  document.getElementById('m-title').textContent='記録を追加';
-  document.getElementById('m-date').value=todayStr();
-  document.getElementById('m-pdate').value=todayStr();
-  refreshVlist(); refreshFlists();
-  const sel=document.getElementById('m-refnae');
-  sel.innerHTML='<option value="">— 選択 —</option>'+naeData.map(n=>`<option value="${n.no}">No.${n.no} ${n.variety}（H${n.house}）${fmt(n.count)}箱</option>`).join('');
-  document.getElementById('m-type').value='nae';
-  document.getElementById('m-field').value=hist.lastField;
-  mtype(); document.getElementById('ov').classList.add('open');
-}
-function closeModal(){
-  document.getElementById('ov').classList.remove('open');
-  document.getElementById('m-typewrap').style.display='block';
-  editMode=null;
-  ['m-naeno','m-house','m-variety','m-count','m-pcount','m-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-}
-function mtype(){
-  const t=document.getElementById('m-type').value;
-  document.getElementById('m-nae-f').style.display=t==='nae'?'block':'none';
-  document.getElementById('m-plant-f').style.display=t==='plant'?'block':'none';
-  if(!editMode)document.getElementById('m-title').textContent=t==='nae'?'苗採りを記録':'植え付けを記録';
-  if(t==='plant'){refreshFlists();document.getElementById('m-field').value=hist.lastField;}
-}
+// ══════════ ADD MODAL ══════════
+function openModal(){ editMode=null; document.getElementById('m-typewrap').style.display='block'; document.getElementById('m-delbtn').style.display='none'; document.getElementById('m-title').textContent='記録を追加'; document.getElementById('m-date').value=todayStr(); document.getElementById('m-pdate').value=todayStr(); refreshVlist();refreshFlists(); const sel=document.getElementById('m-refnae'); sel.innerHTML='<option value="">— 選択 —</option>'+naeData.map(n=>`<option value="${n.no}">No.${n.no} ${n.variety}（H${n.house}）${fmt(n.count)}箱</option>`).join(''); document.getElementById('m-type').value='nae'; document.getElementById('m-field').value=hist.lastField; mtype(); document.getElementById('ov').classList.add('open'); }
+function closeModal(){ document.getElementById('ov').classList.remove('open'); document.getElementById('m-typewrap').style.display='block'; editMode=null; ['m-naeno','m-house','m-variety','m-count','m-pcount','m-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); }
+function mtype(){ const t=document.getElementById('m-type').value; document.getElementById('m-nae-f').style.display=t==='nae'?'block':'none'; document.getElementById('m-plant-f').style.display=t==='plant'?'block':'none'; if(!editMode)document.getElementById('m-title').textContent=t==='nae'?'苗採りを記録':'植え付けを記録'; if(t==='plant'){refreshFlists();document.getElementById('m-field').value=hist.lastField;} }
 function saveRec(){
-  const t=document.getElementById('m-type').value;
-  const note=document.getElementById('m-note').value.trim();
+  const t=document.getElementById('m-type').value, note=document.getElementById('m-note').value.trim();
   if(editMode){
-    if(editMode.type==='nae'){
-      const r=naeData.find(d=>d.no===editMode.no);if(!r)return;
-      const v=document.getElementById('m-variety').value.trim();
-      const c=parseFloat(document.getElementById('m-count').value);
-      if(!v){toast('⚠ 品種を入力');return;}
-      if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;}
-      r.house=document.getElementById('m-house').value.trim()||r.house;
-      r.variety=v; r.count=c;
-      if(!varietyOrder.includes(v))varietyOrder.push(v);
-      toast(`✅ 苗No.${r.no} を更新`);
-    } else {
-      const p=plantData.find(d=>d.id===editMode.id);if(!p)return;
-      const f=document.getElementById('m-field').value.trim();
-      const c=parseFloat(document.getElementById('m-pcount').value);
-      if(!f){toast('⚠ 畑名を入力');return;}
-      if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;}
-      const pd=document.getElementById('m-pdate').value;if(pd)p.date=dateVal(pd);
-      p.field=f; p.count=c; p.naeRef=parseInt(document.getElementById('m-refnae').value)||null; p.note=note;
-      recordHist(f); toast('✅ 植え付け記録を更新');
-    }
+    if(editMode.type==='nae'){ const r=naeData.find(d=>d.no===editMode.no);if(!r)return; const v=document.getElementById('m-variety').value.trim(),c=parseFloat(document.getElementById('m-count').value); if(!v){toast('⚠ 品種を入力');return;} if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;} r.house=document.getElementById('m-house').value.trim()||r.house; r.variety=v;r.count=c; if(!varietyOrder.includes(v))varietyOrder.push(v); toast(`✅ 苗No.${r.no} を更新`);
+    } else { const p=plantData.find(d=>d.id===editMode.id);if(!p)return; const f=document.getElementById('m-field').value.trim(),c=parseFloat(document.getElementById('m-pcount').value); if(!f){toast('⚠ 畑名を入力');return;} if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;} const pd=document.getElementById('m-pdate').value;if(pd)p.date=dateVal(pd); p.field=f;p.count=c;p.naeRef=parseInt(document.getElementById('m-refnae').value)||null;p.note=note; recordHist(f);toast('✅ 植え付け記録を更新'); }
   } else {
-    if(t==='nae'){
-      const v=document.getElementById('m-variety').value.trim();
-      const c=parseFloat(document.getElementById('m-count').value);
-      if(!v){toast('⚠ 品種を入力');return;}
-      if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;}
-      const autoNo=Math.max(0,...naeData.map(d=>d.no))+1;
-      const no=parseInt(document.getElementById('m-naeno').value)||autoNo;
-      if(naeData.find(d=>d.no===no)){toast(`⚠ 苗No.${no}はすでに存在`);return;}
-      const date=dateVal(document.getElementById('m-date').value)||'5/9';
-      naeData.push({no,date,house:document.getElementById('m-house').value.trim()||'-',variety:v,count:c});
-      naeData.sort((a,b)=>a.no-b.no);
-      if(!varietyOrder.includes(v))varietyOrder.push(v);
-      toast(`✅ 苗No.${no}（${v}）を追加`);
-    } else {
-      const f=document.getElementById('m-field').value.trim();
-      const c=parseFloat(document.getElementById('m-pcount').value);
-      if(!f){toast('⚠ 畑名を入力');return;}
-      if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;}
-      const date=dateVal(document.getElementById('m-pdate').value)||'5/9';
-      const naeRef=parseInt(document.getElementById('m-refnae').value)||null;
-      plantData.push({id:_pid++,naeRef,date,field:f,count:c,note});
-      recordHist(f); toast(`✅ ${f} ${fmt(c)}箱 を追加`);
-    }
+    if(t==='nae'){ const v=document.getElementById('m-variety').value.trim(),c=parseFloat(document.getElementById('m-count').value); if(!v){toast('⚠ 品種を入力');return;} if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;} const autoNo=Math.max(0,...naeData.map(d=>d.no))+1,no=parseInt(document.getElementById('m-naeno').value)||autoNo; if(naeData.find(d=>d.no===no)){toast(`⚠ 苗No.${no}はすでに存在`);return;} const date=dateVal(document.getElementById('m-date').value)||'5/9'; naeData.push({no,date,house:document.getElementById('m-house').value.trim()||'-',variety:v,count:c});naeData.sort((a,b)=>a.no-b.no);if(!varietyOrder.includes(v))varietyOrder.push(v);toast(`✅ 苗No.${no}（${v}）を追加`);
+    } else { const f=document.getElementById('m-field').value.trim(),c=parseFloat(document.getElementById('m-pcount').value); if(!f){toast('⚠ 畑名を入力');return;} if(isNaN(c)||c<=0){toast('⚠ 箱数を入力');return;} const date=dateVal(document.getElementById('m-pdate').value)||'5/9',naeRef=parseInt(document.getElementById('m-refnae').value)||null; plantData.push({id:_pid++,naeRef,date,field:f,count:c,note});recordHist(f);toast(`✅ ${f} ${fmt(c)}箱 を追加`); }
   }
   closeModal(); rerenderBg();
 }
 
-// ═══════════════════════ GITHUB SYNC ═══════════════════════
-const GH_REPO  = 'italfarm92-eng/naekanni';
-const GH_FILE  = 'data.json';
-const GH_API   = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE;
-const TOKEN_KEY = 'gh_token_naekanni';
-
-let syncStatus = 'idle';
-function setSyncUI(status, msg='') {
-  syncStatus = status;
-  const el = document.getElementById('sync-btn');
-  if(!el) return;
-  const icons = {idle:'☁️', loading:'⏳', saving:'💾', error:'❌', ok:'✅'};
-  el.textContent = (icons[status]||'☁️') + (msg ? ' '+msg : '');
-}
-
-function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || '';
-}
-function setToken(t) {
-  localStorage.setItem(TOKEN_KEY, t.trim());
-}
-
-function promptToken() {
-  const cur = getToken();
-  const t = prompt(
-    'GitHub Personal Access Tokenを入力してください\n\n' +
-    '取得方法: GitHub → Settings → Developer settings\n' +
-    '→ Personal access tokens → Tokens(classic)\n' +
-    '→ Generate new token → repo にチェック\n\n' +
-    '現在の値: ' + (cur ? cur.slice(0,8)+'...' : '未設定'),
-    cur
-  );
-  if(t !== null && t.trim()) {
-    setToken(t);
-    toast('✅ トークンを保存しました');
-    return t.trim();
-  }
-  return cur;
-}
-
-// GitHub から data.json を読み込む
-async function loadFromGitHub() {
-  setSyncUI('loading','読込中…');
-  try {
-    const res = await fetch(GH_API + '?t=' + Date.now(), {
-      headers: {'Accept':'application/vnd.github+json'}
-    });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const meta = await res.json();
-    // Base64 → バイト列 → UTF-8文字列
-    const b64 = meta.content.replace(/\s/g,'');
-    const bin = atob(b64);
-    const bytes = new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-    const text = new TextDecoder('utf-8').decode(bytes);
-    const json = JSON.parse(text);
-    if(json.naeData     && json.naeData.length)      naeData      = json.naeData;
-    if(json.plantData   && json.plantData.length)    plantData    = json.plantData;
-    if(json.varietyOrder&& json.varietyOrder.length) varietyOrder = json.varietyOrder;
-    if(json.fieldMaster && json.fieldMaster.length)  fieldMaster  = json.fieldMaster;
-    if(json.hist)                                    hist         = json.hist;
-    if(json._pid)                                    _pid         = json._pid;
-    if(plantData.length) _pid = Math.max(_pid, Math.max(...plantData.map(p=>p.id))+1);
-    saveLocalOnly();
-    setSyncUI('ok','読込済');
-    rerenderBgNoSync();
-    toast('✅ GitHubからデータを読み込みました');
-  } catch(err) {
-    setSyncUI('error','読込失敗');
-    toast('❌ 読込失敗: ' + err.message);
-  }
-}
-
-// GitHub へ data.json を保存する
-async function saveToGitHub() {
-  let token = getToken();
-  if(!token) { token = promptToken(); }
-  if(!token) { toast('⚠ トークンが必要です'); return; }
-  setSyncUI('saving','保存中…');
-  try {
-    // 現在のSHAを取得
-    let sha = null;
-    const resGet = await fetch(GH_API, {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/vnd.github+json'
-      }
-    });
-    if(resGet.ok) { const m = await resGet.json(); sha = m.sha; }
-
-    // JSON文字列 → UTF-8バイト列 → Base64
-    const text = JSON.stringify({naeData, plantData, varietyOrder, fieldMaster, hist, _pid}, null, 2);
-    const bytes = new TextEncoder().encode(text);
-    let bin = '';
-    bytes.forEach(b => bin += String.fromCharCode(b));
-    const b64 = btoa(bin);
-
-    const body = {
-      message: 'データ更新 ' + new Date().toLocaleString('ja-JP'),
-      content: b64,
-    };
-    if(sha) body.sha = sha;
-
-    const resPut = await fetch(GH_API, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-    if(!resPut.ok) {
-      const err = await resPut.json();
-      throw new Error(err.message || 'HTTP ' + resPut.status);
-    }
-    saveLocalOnly();
-    pendingSave = false;
-    setSyncUI('ok','保存済');
-    toast('✅ GitHubに保存しました');
-  } catch(err) {
-    setSyncUI('error','保存失敗');
-    toast('❌ 保存失敗: ' + err.message);
-  }
-}
-
-// ═══════════════════════ LOCAL STORAGE ═══════════════════════
-const LS_KEY = 'naekanni_v1';
-
-// ローカルのみ保存（GitHub同期なし）
-function saveLocalOnly() {
-  try {
-    const data = {naeData, plantData, varietyOrder, fieldMaster, hist, _pid};
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-  } catch(e) {}
-}
-
-// rerenderBg のGitHubなし版（ロード時などに使用）
-function rerenderBgNoSync() {
-  renderDash();
-  const keys=['dash','stock','nae','plant','field','settings'];
-  const i=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
-  if(i>0&&renderMap[keys[i]]) renderMap[keys[i]]();
-}
-
-function saveLocal() {
-  saveLocalOnly();
-  const ts = new Date().toLocaleTimeString('ja-JP');
-  setSyncUI('idle', ts + ' 自動保存');
-}
-
-function loadLocal() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return false;
-    const data = JSON.parse(raw);
-    if(data.naeData     && data.naeData.length)      naeData       = data.naeData;
-    if(data.plantData   && data.plantData.length)     plantData     = data.plantData;
-    if(data.varietyOrder&& data.varietyOrder.length)  varietyOrder  = data.varietyOrder;
-    if(data.fieldMaster && data.fieldMaster.length)   fieldMaster   = data.fieldMaster;
-    if(data.hist)                                      hist          = data.hist;
-    if(data._pid)                                      _pid          = data._pid;
-    return true;
-  } catch(e) {
-    return false;
-  }
-}
-
-function clearLocal() {
-  if(!confirm('保存データをすべて削除しますか？\nこの操作は取り消せません。')) return;
-  localStorage.removeItem(LS_KEY);
-  toast('🗑 データをクリアしました。ページを再読み込みしてください。');
-}
-
-function exportJSON() {
-  const data = {naeData, plantData, varietyOrder, fieldMaster};
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'naekanni_backup_' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  toast('✅ バックアップをダウンロードしました');
-}
-
-function importJSON() {
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = '.json';
-  input.onchange = e => {
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        if(!data.naeData) { toast('⚠ 正しいバックアップファイルではありません'); return; }
-        if(!confirm('現在のデータをバックアップファイルで上書きしますか？')) return;
-        naeData       = data.naeData;
-        plantData     = data.plantData     || [];
-        varietyOrder  = data.varietyOrder  || [];
-        fieldMaster   = data.fieldMaster   || [];
-        _pid = plantData.length ? Math.max(...plantData.map(p=>p.id))+1 : 18;
-        saveLocal();
-        rerenderBg();
-        toast('✅ インポートしました');
-      } catch(err) { toast('⚠ 読み込みエラー: ' + err.message); }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
-// rerenderBg に自動保存を統合済み（下記で定義）
-
-// ═══════════════════════ AUTO SAVE ═══════════════════════
-let autoSaveTimer = null;
-let pendingSave = false;
-
-// データ変更時に「保存待ち」フラグを立てる
-function markDirty() {
-  pendingSave = true;
-  setSyncUI('idle', '未保存あり ●');
-}
-
-// 自動保存チェック（30秒ごとに未保存があれば保存）
-function startAutoSave() {
-  autoSaveTimer = setInterval(async () => {
-    if(pendingSave && getToken()) {
-      pendingSave = false;
-      await saveToGitHub();
-    }
-  }, 30000); // 30秒
-}
-
-// アプリを閉じる前にも保存
-window.addEventListener('beforeunload', () => {
-  if(pendingSave && getToken()) saveToGitHub();
-});
-
-// Safariでホーム画面から閉じた時
-document.addEventListener('visibilitychange', async () => {
-  if(document.visibilityState === 'hidden' && pendingSave && getToken()) {
-    pendingSave = false;
-    await saveToGitHub();
-  }
-});
-
-// ═══════════════════════ INIT ═══════════════════════
+// ══════════ INIT ══════════
 const loaded = loadLocal();
-renderDash(); refreshFlists(); refreshVlist();
-if(loaded) {
-  setSyncUI('ok', 'データ読込済');
-} else {
-  setSyncUI('idle', '初回起動');
-}
-// 起動時にGitHubから最新データを読み込む
-if(getToken()) {
-  loadFromGitHub();
-}
-// 自動保存スタート
-startAutoSave();
+renderDash(); renderAll(); refreshFlists(); refreshVlist();
+if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
+// トークンがあればGitHubから最新データを自動読み込み
+if(getToken()) loadFromGitHub();
 </script>
 </body>
 </html>
