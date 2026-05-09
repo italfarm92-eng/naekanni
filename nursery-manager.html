@@ -145,16 +145,24 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .set-rl{font-weight:600;color:var(--g0);font-size:.82rem}
 .set-rs{font-size:.66rem;color:var(--sub);margin-top:1px}
 /* drag edit rows */
-.ed-row{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #f0ede6;background:var(--white);transition:.15s}
+.ed-row{display:flex;align-items:center;gap:0;padding:8px 10px;border-bottom:1px solid #f0ede6;background:var(--white);transition:.15s;overflow:hidden}
 .ed-row:last-child{border:none}
 .ed-row.drag-over{background:var(--g5);border:2px dashed var(--g3)}
-.drag-h{cursor:grab;color:var(--sub);font-size:1rem;padding:0 4px;touch-action:none;user-select:none;flex-shrink:0}
-.ed-inp{flex:1;padding:6px 9px;border:1.5px solid var(--g4);border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;outline:none;background:var(--white)}
+.ed-row.dragging{opacity:.4}
+/* 左: 上下ボタン縦並び */
+.ed-arrows{display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-right:6px}
+.ed-arr{background:var(--g5);border:none;border-radius:6px;width:28px;height:24px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g2);font-weight:700;-webkit-tap-highlight-color:transparent}
+.ed-arr:active{background:var(--g4)}
+/* 中: 入力欄 */
+.ed-inp{flex:1;min-width:0;padding:7px 9px;border:1.5px solid var(--g4);border-radius:7px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;outline:none;background:var(--white)}
 .ed-inp:focus{border-color:var(--g3)}
-.ed-inp.sub-inp{font-size:.72rem;color:var(--sub);margin-top:3px}
+.ed-inp.sub-inp{font-size:.72rem;color:var(--sub);margin-top:4px}
+/* 右: 削除ボタン */
+.ed-del{background:var(--red2);border:none;border-radius:6px;width:32px;height:32px;font-size:1rem;cursor:pointer;flex-shrink:0;margin-left:6px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.ed-del:active{background:var(--red);color:#fff}
 .add-row{display:flex;gap:8px;padding:10px 13px;border-top:1px solid var(--bdr)}
-.add-inp{flex:1;padding:8px 10px;border:1.5px solid var(--g4);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;outline:none}
-.add-btn{padding:8px 14px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer}
+.add-inp{flex:1;min-width:0;padding:8px 10px;border:1.5px solid var(--g4);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;outline:none}
+.add-btn{padding:8px 14px;background:var(--g2);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;flex-shrink:0}
 /* CI sheet */
 .ci-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:400;align-items:flex-end;justify-content:center}
 .ci-overlay.open{display:flex}
@@ -793,9 +801,55 @@ function renderSettings(){
   const stabs=[['variety','🌿 品種'],['fieldMaster','📍 畑'],['naeList','🌱 苗No'],['plantList','🌾 植付']];
   let body='';
   if(settingsTab==='variety'){
-    body=`<div class="set-section"><div class="set-head">品種マスタ <button class="set-head-btn" onclick="saveVarOrder()">✅ 保存</button></div><div id="var-list">${varietyOrder.map((v,i)=>`<div class="ed-row" draggable="true" ondragstart="vDS(event,${i})" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="vDrop(event,${i})"><div style="display:flex;flex-direction:column;gap:3px;margin-right:6px"><button class="ibtn" onclick="moveV(${i},-1)" style="font-size:1rem;padding:2px 8px">↑</button><button class="ibtn" onclick="moveV(${i},1)" style="font-size:1rem;padding:2px 8px">↓</button></div><input class="ed-inp" id="vi-${i}" value="${v}" placeholder="品種名"><button class="ibtn del" onclick="removeV(${i})" style="flex-shrink:0;font-size:1rem;padding:4px 8px">🗑</button></div>`).join('')}</div><div class="add-row"><input class="add-inp" id="new-var" placeholder="新しい品種名"><button class="add-btn" onclick="addV()">追加</button></div></div>`;
+    body=`<div class="set-section">
+  <div class="set-head">品種マスタ（↑↓で並替・長押しでドラッグ） <button class="set-head-btn" onclick="saveVarOrder()">✅ 保存</button></div>
+  <div id="var-list">
+    ${varietyOrder.map((v,i)=>`
+      <div class="ed-row" draggable="true"
+        ondragstart="vDS(event,${i})"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="vDrop(event,${i})">
+        <div class="ed-arrows">
+          <button class="ed-arr" onclick="moveV(${i},-1)">↑</button>
+          <button class="ed-arr" onclick="moveV(${i},1)">↓</button>
+        </div>
+        <input class="ed-inp" id="vi-${i}" value="${v}" placeholder="品種名">
+        <button class="ed-del" onclick="removeV(${i})">🗑</button>
+      </div>`).join('')}
+  </div>
+  <div class="add-row">
+    <input class="add-inp" id="new-var" placeholder="新しい品種名を入力">
+    <button class="add-btn" onclick="addV()">＋追加</button>
+  </div>
+</div>`;
   } else if(settingsTab==='fieldMaster'){
-    body=`<div class="set-section"><div class="set-head">畑マスタ <button class="set-head-btn" onclick="saveFdMaster()">✅ 保存</button></div><div id="field-list">${fieldMaster.map((f,i)=>`<div class="ed-row" draggable="true" ondragstart="fdDS(event,${i})" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="fdDrop(event,${i})"><div style="display:flex;flex-direction:column;gap:3px;margin-right:6px"><button class="ibtn" onclick="moveFd(${i},-1)" style="font-size:1rem;padding:2px 8px">↑</button><button class="ibtn" onclick="moveFd(${i},1)" style="font-size:1rem;padding:2px 8px">↓</button></div><div style="flex:1;display:flex;flex-direction:column;gap:4px"><input class="ed-inp" id="fn-${i}" value="${f.name}" placeholder="畑名"><input class="ed-inp sub-inp" id="fm-${i}" value="${f.note||''}" placeholder="メモ（任意）"></div><button class="ibtn del" onclick="removeFd(${i})" style="flex-shrink:0;font-size:1rem;padding:4px 8px">🗑</button></div>`).join('')}</div><div class="add-row"><input class="add-inp" id="new-field" placeholder="新しい畑名"><button class="add-btn" style="background:var(--pu)" onclick="addFd()">追加</button></div></div><div style="background:var(--pu2);border-radius:10px;padding:9px 13px;font-size:.73rem;color:#4c1d95">💡 名前変更すると植え付け記録も自動で更新されます</div>`;
+    body=`<div class="set-section">
+  <div class="set-head">畑マスタ（↑↓で並替・長押しでドラッグ） <button class="set-head-btn" onclick="saveFdMaster()">✅ 保存</button></div>
+  <div id="field-list">
+    ${fieldMaster.map((f,i)=>`
+      <div class="ed-row" draggable="true"
+        ondragstart="fdDS(event,${i})"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="fdDrop(event,${i})">
+        <div class="ed-arrows">
+          <button class="ed-arr" onclick="moveFd(${i},-1)">↑</button>
+          <button class="ed-arr" onclick="moveFd(${i},1)">↓</button>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+          <input class="ed-inp" id="fn-${i}" value="${f.name}" placeholder="畑名">
+          <input class="ed-inp sub-inp" id="fm-${i}" value="${f.note||''}" placeholder="メモ（任意）">
+        </div>
+        <button class="ed-del" onclick="removeFd(${i})">🗑</button>
+      </div>`).join('')}
+  </div>
+  <div class="add-row">
+    <input class="add-inp" id="new-field" placeholder="新しい畑名を入力">
+    <button class="add-btn" style="background:var(--pu)" onclick="addFd()">＋追加</button>
+  </div>
+</div>
+<div style="background:var(--pu2);border-radius:10px;padding:9px 13px;font-size:.73rem;color:#4c1d95;margin-top:8px">💡 名前変更すると植え付け記録も自動で更新されます</div>`;
   } else if(settingsTab==='naeList'){
     body=`<div class="set-section"><div class="set-head">苗No一覧 — ${naeData.length}件</div>${naeData.map(r=>`<div class="set-row"><div class="set-ri"><div class="set-rl">No.${r.no}　${r.variety}</div><div class="set-rs">H${r.house} ／ ${r.date} ／ ${fmt(r.count)}箱 ／ 残${fmt(remForNae(r.no))}箱</div></div><button class="ibtn" onclick="editNae(${r.no})">✏️</button></div>`).join('')}</div>`;
   } else if(settingsTab==='plantList'){
@@ -853,6 +907,68 @@ function saveRec(){
   closeModal(); rerenderBg();
 }
 
+// ══════════ TOUCH DRAG (iPhone対応) ══════════
+let touchDragEl=null, touchDragIdx=null, touchDragType=null, touchClone=null;
+
+function initTouchDrag(){
+  document.addEventListener('touchstart', e=>{
+    const row = e.target.closest('.ed-row');
+    if(!row) return;
+    // 長押し判定
+    touchDragEl = row;
+    row._touchTimer = setTimeout(()=>{
+      startTouchDrag(row, e.touches[0]);
+    }, 400);
+  }, {passive:true});
+
+  document.addEventListener('touchmove', e=>{
+    if(!touchClone) { if(touchDragEl) clearTimeout(touchDragEl._touchTimer); return; }
+    e.preventDefault();
+    const t = e.touches[0];
+    touchClone.style.top  = (t.clientY - touchClone._offY) + 'px';
+    touchClone.style.left = '10px';
+    touchClone.style.right = '10px';
+    // ハイライト対象を探す
+    document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const target = el && el.closest('.ed-row');
+    if(target && target !== touchDragEl) target.classList.add('drag-over');
+  }, {passive:false});
+
+  document.addEventListener('touchend', e=>{
+    if(touchDragEl) clearTimeout(touchDragEl._touchTimer);
+    if(!touchClone){ touchDragEl=null; return; }
+    const t = e.changedTouches[0];
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const target = el && el.closest('.ed-row');
+    if(target && target !== touchDragEl){
+      const list = [...touchDragEl.parentNode.querySelectorAll('.ed-row')];
+      const fromIdx = list.indexOf(touchDragEl);
+      const toIdx   = list.indexOf(target);
+      if(touchDragType==='variety') { const v=getVarList(); const[m]=v.splice(fromIdx,1); v.splice(toIdx,0,m); varietyOrder=[...v]; renderSettings(); }
+      else                          { const f=getFdList();  const[m]=f.splice(fromIdx,1); f.splice(toIdx,0,m); fieldMaster=[...f];  renderSettings(); }
+    }
+    document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
+    touchClone.remove(); touchClone=null; touchDragEl=null;
+  });
+}
+
+function startTouchDrag(row, touch){
+  // 何リストか判断
+  touchDragType = row.closest('#var-list') ? 'variety' : 'field';
+  // クローン作成
+  const clone = row.cloneNode(true);
+  clone.style.cssText = `position:fixed;z-index:999;left:10px;right:10px;opacity:.85;background:var(--g5);border-radius:10px;box-shadow:var(--sh2);pointer-events:none;`;
+  const rect = row.getBoundingClientRect();
+  clone._offY = touch.clientY - rect.top;
+  clone.style.top = (touch.clientY - clone._offY) + 'px';
+  document.body.appendChild(clone);
+  touchClone = clone;
+  row.style.opacity = '0.3';
+  touchDragEl = row;
+  if(navigator.vibrate) navigator.vibrate(30);
+}
+
 // ══════════ INIT ══════════
 // まずローカルデータで即表示（画面が白くならないように）
 const loaded = loadLocal();
@@ -873,6 +989,7 @@ if(getToken()) {
   // トークンなし → ローカルデータのみ
   if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
 }
+initTouchDrag();
 </script>
 </body>
 </html>
