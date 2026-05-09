@@ -11,14 +11,14 @@
       "no": 2,
       "date": "4/30",
       "house": "4",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 8
     },
     {
       "no": 3,
       "date": "4/30",
       "house": "中村",
-      "variety": "黄金",
+      "variety": "こがね",
       "count": 19
     },
     {
@@ -32,91 +32,91 @@
       "no": 5,
       "date": "5/1",
       "house": "3",
-      "variety": "B紅まさり",
+      "variety": "紅まさり",
       "count": 7
     },
     {
       "no": 6,
       "date": "5/2",
       "house": "中村",
-      "variety": "黄金",
+      "variety": "こがね",
       "count": 12
     },
     {
       "no": 7,
       "date": "5/2",
       "house": "こうすけ苗",
-      "variety": "紅まさり",
+      "variety": "まさり",
       "count": 24
     },
     {
       "no": 8,
       "date": "5/3",
       "house": "こうすけ苗",
-      "variety": "紅まさり",
+      "variety": "まさり",
       "count": 37
     },
     {
       "no": 9,
       "date": "5/5",
       "house": "1",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 29
     },
     {
       "no": 10,
       "date": "5/5",
       "house": "1",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 2
     },
     {
       "no": 11,
       "date": "5/6",
       "house": "2",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 15
     },
     {
       "no": 12,
       "date": "5/5",
       "house": "中村",
-      "variety": "黄金",
+      "variety": "こがね",
       "count": 5
     },
     {
       "no": 13,
       "date": "5/7",
       "house": "2",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 2
     },
     {
       "no": 14,
       "date": "5/7",
       "house": "5",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 17.5
     },
     {
       "no": 15,
       "date": "5/7",
       "house": "5",
-      "variety": "黄金",
+      "variety": "こがね",
       "count": 17
     },
     {
       "no": 16,
       "date": "5/8",
       "house": "5",
-      "variety": "紅まさり",
+      "variety": "種まさり",
       "count": 19
     },
     {
       "no": 17,
       "date": "5/8",
       "house": "4",
-      "variety": "B黄金",
+      "variety": "Bごがね",
       "count": 6
     },
     {
@@ -298,12 +298,13 @@
     }
   ],
   "varietyOrder": [
-    "B黄金",
-    "黄金",
-    "B紅まさり",
-    "紅まさり",
+    "たいがん",
+    "Bごがね",
+    "こがね",
     "みちしずく",
-    "たいがん"
+    "紅まさり",
+    "まさり",
+    "種まさり"
   ],
   "fieldMaster": [
     {
