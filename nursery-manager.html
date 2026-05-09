@@ -448,14 +448,19 @@ function fromB64(b64) {
 }
 
 async function loadFromGitHub() {
+  const token = getToken();
+  if(!token) { doSetToken(); return; }
   setSyncStatus('読込中…');
   try {
-    // Raw URLで直接取得（CORSの問題を回避）
-    const rawUrl = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/' + GH_FILE + '?t=' + Date.now();
-    const res = await fetch(rawUrl, {cache:'no-store'});
+    const res = await fetch(GH_API + '?t=' + Date.now(), {
+      headers:{
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+      }
+    });
     if(!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const json = JSON.parse(text);
+    const meta = await res.json();
+    const json = fromB64(meta.content);
     applyData(json);
     saveLocal();
     _dirty = false;
@@ -832,7 +837,9 @@ const loaded = loadLocal();
 renderDash(); renderAll(); refreshFlists(); refreshVlist();
 if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
 // トークンがあればGitHubから最新データを自動読み込み
-if(getToken()) loadFromGitHub();
+if(getToken()) {
+  setTimeout(() => loadFromGitHub(), 500);
+}
 </script>
 </body>
 </html>
