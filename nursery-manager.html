@@ -235,21 +235,24 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
     <div class="h-sub">苗管理 N03 ／ 令和8年5月9日</div>
     <h1>🌱 苗・植え付け管理</h1>
   </div>
-  <div style="display:flex;gap:6px;align-items:center">
-    <span id="sync-btn" style="font-size:.6rem;color:rgba(255,255,255,.5);white-space:nowrap">☁️ 読込済</span>
+  <div style="display:flex;gap:5px;align-items:center">
+    <button onclick="loadFromGitHub()"
+      style="background:var(--g1);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap">☁️ 読込</button>
+    <button onclick="saveToGitHub()"
+      style="background:var(--g2);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap">💾 保存</button>
     <button onclick="showDataMenu()"
-      style="background:var(--g1);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap"
-      title="データメニュー">⋯</button>
+      style="background:var(--g1);color:#fff;border:none;border-radius:8px;font-size:.65rem;padding:5px 9px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap">⋯</button>
   </div>
 </header>
 
 <!-- DATA MENU -->
 <div id="data-menu-overlay" onclick="hideDataMenu()"
-  style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.3)">
-</div>
+  style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.3)"></div>
 <div id="data-menu"
-  style="display:none;position:fixed;top:52px;right:12px;z-index:260;background:var(--white);border-radius:13px;box-shadow:0 4px 24px rgba(0,0,0,.18);overflow:hidden;min-width:180px">
+  style="display:none;position:fixed;top:52px;right:12px;z-index:260;background:var(--white);border-radius:13px;box-shadow:0 4px 24px rgba(0,0,0,.18);overflow:hidden;min-width:190px">
   <div style="background:var(--g1);color:#fff;padding:8px 14px;font-size:.72rem;font-weight:700">データ管理</div>
+  <div id="sync-btn" style="padding:7px 14px;font-size:.7rem;color:var(--sub);border-bottom:1px solid var(--bdr)">☁️ 状態: 待機中</div>
+  <button onclick="promptToken();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr)">🔑 GitHubトークン設定</button>
   <button onclick="exportJSON();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr)">📥 バックアップ保存（JSON）</button>
   <button onclick="importJSON();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;border-bottom:1px solid var(--bdr)">📤 バックアップから復元</button>
   <button onclick="clearLocal();hideDataMenu()" style="width:100%;padding:11px 14px;text-align:left;border:none;background:none;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;color:var(--red)">🗑 データをリセット</button>
@@ -484,7 +487,9 @@ function rerenderBg(){
   const keys=['dash','stock','nae','plant','field','settings'];
   const i=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
   if(i>0&&renderMap[keys[i]]) renderMap[keys[i]]();
-  saveLocal();
+  saveLocalOnly();
+  const ts = new Date().toLocaleTimeString('ja-JP');
+  setSyncUI('idle', ts + ' 自動保存');
 }
 
 // ═══════════════════════ ALERT ═══════════════════════
@@ -1286,85 +1291,117 @@ function saveRec(){
   closeModal(); rerenderBg();
 }
 
-// ═══════════════════════ CLOUD SYNC ═══════════════════════
-// ★ここにApps ScriptのURLを貼り付ける★
-const GAS_URL = 'YOUR_GAS_URL_HERE';
+// ═══════════════════════ GITHUB SYNC ═══════════════════════
+const GH_REPO  = 'italfarm92-eng/italfarm92-eng';
+const GH_FILE  = 'data.json';
+const GH_API   = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE;
+const TOKEN_KEY = 'gh_token_naekanni';
 
-let syncStatus = 'idle'; // idle | loading | saving | error | ok
-
+let syncStatus = 'idle';
 function setSyncUI(status, msg='') {
   syncStatus = status;
   const el = document.getElementById('sync-btn');
   if(!el) return;
-  const icons = {idle:'☁️',loading:'⏳',saving:'💾',error:'❌',ok:'✅'};
-  el.textContent = (icons[status]||'☁️') + (msg?' '+msg:'');
-  el.style.background = status==='error'?'var(--red)':status==='ok'?'var(--g2)':'var(--g1)';
+  const icons = {idle:'☁️', loading:'⏳', saving:'💾', error:'❌', ok:'✅'};
+  el.textContent = (icons[status]||'☁️') + (msg ? ' '+msg : '');
 }
 
-async function loadFromCloud() {
-  if(GAS_URL === 'YOUR_GAS_URL_HERE') {
-    toast('⚠ GAS_URLを設定してください（コード内）');
-    return;
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || '';
+}
+function setToken(t) {
+  localStorage.setItem(TOKEN_KEY, t.trim());
+}
+
+function promptToken() {
+  const cur = getToken();
+  const t = prompt(
+    'GitHub Personal Access Tokenを入力してください\n\n' +
+    '取得方法: GitHub → Settings → Developer settings\n' +
+    '→ Personal access tokens → Tokens(classic)\n' +
+    '→ Generate new token → repo にチェック\n\n' +
+    '現在の値: ' + (cur ? cur.slice(0,8)+'...' : '未設定'),
+    cur
+  );
+  if(t !== null && t.trim()) {
+    setToken(t);
+    toast('✅ トークンを保存しました');
+    return t.trim();
   }
+  return cur;
+}
+
+// GitHub から data.json を読み込む
+async function loadFromGitHub() {
   setSyncUI('loading','読込中…');
   try {
-    const res = await fetch(GAS_URL + '?action=load');
-    const data = await res.json();
-    if(!data.ok) throw new Error(data.error);
-    // データ反映
-    if(data.naeData     && data.naeData.length)     naeData       = data.naeData;
-    if(data.plantData   && data.plantData.length)   plantData     = data.plantData;
-    if(data.varietyOrder&& data.varietyOrder.length) varietyOrder = data.varietyOrder;
-    if(data.fieldMaster && data.fieldMaster.length)  fieldMaster  = data.fieldMaster;
-    // _pid を最大idから更新
-    if(plantData.length) _pid = Math.max(...plantData.map(p=>p.id)) + 1;
-    setSyncUI('ok','読込完了');
-    rerenderBg();
-    toast('✅ クラウドからデータを読み込みました');
+    const res = await fetch(GH_API + '?t=' + Date.now(), {
+      headers: {'Accept':'application/vnd.github+json'}
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const meta = await res.json();
+    const json = JSON.parse(atob(meta.content.replace(/\n/g,'')));
+    if(json.naeData     && json.naeData.length)      naeData      = json.naeData;
+    if(json.plantData   && json.plantData.length)    plantData    = json.plantData;
+    if(json.varietyOrder&& json.varietyOrder.length) varietyOrder = json.varietyOrder;
+    if(json.fieldMaster && json.fieldMaster.length)  fieldMaster  = json.fieldMaster;
+    if(json.hist)                                    hist         = json.hist;
+    if(json._pid)                                    _pid         = json._pid;
+    if(plantData.length) _pid = Math.max(_pid, Math.max(...plantData.map(p=>p.id))+1);
+    // ローカルにもキャッシュ
+    saveLocalOnly();
+    setSyncUI('ok', '読込済');
+    rerenderBgNoSync();
+    toast('✅ GitHubからデータを読み込みました');
   } catch(err) {
     setSyncUI('error','読込失敗');
     toast('❌ 読込失敗: ' + err.message);
   }
 }
 
-async function saveToCloud() {
-  if(GAS_URL === 'YOUR_GAS_URL_HERE') {
-    toast('⚠ GAS_URLを設定してください');
-    return;
-  }
+// GitHub へ data.json を保存する
+async function saveToGitHub() {
+  let token = getToken();
+  if(!token) { token = promptToken(); }
+  if(!token) { toast('⚠ トークンが必要です'); return; }
   setSyncUI('saving','保存中…');
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        action: 'save',
-        data: {naeData, plantData, varietyOrder, fieldMaster}
-      })
+    // 現在のSHAを取得
+    const resGet = await fetch(GH_API, {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json'
+      }
     });
-    const data = await res.json();
-    if(!data.ok) throw new Error(data.error);
-    setSyncUI('ok','保存済');
-    toast('✅ Googleスプレッドシートに保存しました');
+    let sha = null;
+    if(resGet.ok) { const m = await resGet.json(); sha = m.sha; }
+
+    const content = {naeData, plantData, varietyOrder, fieldMaster, hist, _pid};
+    const body = {
+      message: 'データ更新 ' + new Date().toLocaleString('ja-JP'),
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+    };
+    if(sha) body.sha = sha;
+
+    const resPut = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(!resPut.ok) {
+      const err = await resPut.json();
+      throw new Error(err.message || 'HTTP ' + resPut.status);
+    }
+    saveLocalOnly(); // ローカルにもキャッシュ
+    setSyncUI('ok', '保存済');
+    toast('✅ GitHubに保存しました');
   } catch(err) {
     setSyncUI('error','保存失敗');
     toast('❌ 保存失敗: ' + err.message);
-  }
-}
-
-async function initCloud() {
-  if(GAS_URL === 'YOUR_GAS_URL_HERE') { toast('⚠ GAS_URLを設定してください'); return; }
-  if(!confirm('スプレッドシートにシートを初期化しますか？（初回のみ）')) return;
-  setSyncUI('loading','初期化中…');
-  try {
-    const res = await fetch(GAS_URL + '?action=init');
-    const data = await res.json();
-    if(!data.ok) throw new Error(data.error);
-    setSyncUI('ok','初期化完了');
-    toast('✅ スプレッドシートを初期化しました');
-  } catch(err) {
-    setSyncUI('error','失敗');
-    toast('❌ 初期化失敗: ' + err.message);
   }
 }
 
@@ -1380,15 +1417,26 @@ function hideDataMenu(){
 // ═══════════════════════ LOCAL STORAGE ═══════════════════════
 const LS_KEY = 'naekanni_v1';
 
-function saveLocal() {
+// ローカルのみ保存（GitHub同期なし）
+function saveLocalOnly() {
   try {
     const data = {naeData, plantData, varietyOrder, fieldMaster, hist, _pid};
     localStorage.setItem(LS_KEY, JSON.stringify(data));
-    const ts = new Date().toLocaleTimeString('ja-JP');
-    setSyncUI('ok', ts + ' 保存済');
-  } catch(e) {
-    toast('⚠ 保存失敗: ' + e.message);
-  }
+  } catch(e) {}
+}
+
+// rerenderBg のGitHubなし版（ロード時などに使用）
+function rerenderBgNoSync() {
+  renderDash();
+  const keys=['dash','stock','nae','plant','field','settings'];
+  const i=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
+  if(i>0&&renderMap[keys[i]]) renderMap[keys[i]]();
+}
+
+function saveLocal() {
+  saveLocalOnly();
+  const ts = new Date().toLocaleTimeString('ja-JP');
+  setSyncUI('idle', ts + ' 自動保存');
 }
 
 function loadLocal() {
