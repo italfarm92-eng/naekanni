@@ -1339,7 +1339,9 @@ async function loadFromGitHub() {
     });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const meta = await res.json();
-    const json = JSON.parse(atob(meta.content.replace(/\n/g,'')));
+    const raw = meta.content.replace(/\n/g,'');
+    const decoded = decodeURIComponent(atob(raw).split('').map(c=>('%'+('00'+c.charCodeAt(0).toString(16)).slice(-2))).join(''));
+    const json = JSON.parse(decoded);
     if(json.naeData     && json.naeData.length)      naeData      = json.naeData;
     if(json.plantData   && json.plantData.length)    plantData    = json.plantData;
     if(json.varietyOrder&& json.varietyOrder.length) varietyOrder = json.varietyOrder;
@@ -1378,7 +1380,7 @@ async function saveToGitHub() {
     const content = {naeData, plantData, varietyOrder, fieldMaster, hist, _pid};
     const body = {
       message: 'データ更新 ' + new Date().toLocaleString('ja-JP'),
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+      content: btoa(encodeURIComponent(JSON.stringify(content, null, 2)).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x'+p1))),
     };
     if(sha) body.sha = sha;
 
