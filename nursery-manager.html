@@ -487,9 +487,8 @@ function rerenderBg(){
   const keys=['dash','stock','nae','plant','field','settings'];
   const i=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
   if(i>0&&renderMap[keys[i]]) renderMap[keys[i]]();
-  saveLocalOnly();
-  const ts = new Date().toLocaleTimeString('ja-JP');
-  setSyncUI('idle', ts + ' 自動保存');
+  saveLocalOnly();   // 端末ローカルに即保存
+  markDirty();       // GitHub保存待ちフラグを立てる
 }
 
 // ═══════════════════════ ALERT ═══════════════════════
@@ -1500,6 +1499,39 @@ function importJSON() {
 
 // rerenderBg に自動保存を統合済み（下記で定義）
 
+// ═══════════════════════ AUTO SAVE ═══════════════════════
+let autoSaveTimer = null;
+let pendingSave = false;
+
+// データ変更時に「保存待ち」フラグを立てる
+function markDirty() {
+  pendingSave = true;
+  setSyncUI('idle', '未保存あり ●');
+}
+
+// 自動保存チェック（30秒ごとに未保存があれば保存）
+function startAutoSave() {
+  autoSaveTimer = setInterval(async () => {
+    if(pendingSave && getToken()) {
+      pendingSave = false;
+      await saveToGitHub();
+    }
+  }, 30000); // 30秒
+}
+
+// アプリを閉じる前にも保存
+window.addEventListener('beforeunload', () => {
+  if(pendingSave && getToken()) saveToGitHub();
+});
+
+// Safariでホーム画面から閉じた時
+document.addEventListener('visibilitychange', async () => {
+  if(document.visibilityState === 'hidden' && pendingSave && getToken()) {
+    pendingSave = false;
+    await saveToGitHub();
+  }
+});
+
 // ═══════════════════════ INIT ═══════════════════════
 const loaded = loadLocal();
 renderDash(); refreshFlists(); refreshVlist();
@@ -1508,6 +1540,12 @@ if(loaded) {
 } else {
   setSyncUI('idle', '初回起動');
 }
+// 起動時にGitHubから最新データを読み込む
+if(getToken()) {
+  loadFromGitHub();
+}
+// 自動保存スタート
+startAutoSave();
 </script>
 </body>
 </html>
