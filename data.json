@@ -11,14 +11,14 @@
       "no": 2,
       "date": "4/30",
       "house": "4",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 8
     },
     {
       "no": 3,
       "date": "4/30",
       "house": "中村",
-      "variety": "こがね",
+      "variety": "黄金",
       "count": 19
     },
     {
@@ -32,77 +32,77 @@
       "no": 5,
       "date": "5/1",
       "house": "3",
-      "variety": "紅まさり",
+      "variety": "B紅まさり",
       "count": 7
     },
     {
       "no": 6,
       "date": "5/2",
       "house": "中村",
-      "variety": "こがね",
+      "variety": "黄金",
       "count": 12
     },
     {
       "no": 7,
       "date": "5/2",
       "house": "こうすけ苗",
-      "variety": "まさり",
+      "variety": "紅まさり",
       "count": 24
     },
     {
       "no": 8,
       "date": "5/3",
       "house": "こうすけ苗",
-      "variety": "まさり",
+      "variety": "紅まさり",
       "count": 37
     },
     {
       "no": 9,
       "date": "5/5",
       "house": "1",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 29
     },
     {
       "no": 10,
       "date": "5/5",
       "house": "1",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 2
     },
     {
       "no": 11,
       "date": "5/6",
       "house": "2",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 15
     },
     {
       "no": 12,
       "date": "5/5",
       "house": "中村",
-      "variety": "こがね",
+      "variety": "黄金",
       "count": 5
     },
     {
       "no": 13,
       "date": "5/7",
       "house": "2",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 2
     },
     {
       "no": 14,
       "date": "5/7",
       "house": "5",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 17.5
     },
     {
       "no": 15,
       "date": "5/7",
       "house": "5",
-      "variety": "こがね",
+      "variety": "黄金",
       "count": 17
     },
     {
@@ -116,7 +116,7 @@
       "no": 17,
       "date": "5/8",
       "house": "4",
-      "variety": "Bごがね",
+      "variety": "B黄金",
       "count": 6
     },
     {
@@ -298,12 +298,12 @@
     }
   ],
   "varietyOrder": [
-    "たいがん",
-    "Bごがね",
-    "こがね",
-    "みちしずく",
+    "B黄金",
+    "黄金",
+    "B紅まさり",
     "紅まさり",
-    "まさり",
+    "みちしずく",
+    "たいがん",
     "種まさり"
   ],
   "fieldMaster": [
