@@ -908,29 +908,28 @@ function saveRec(){
 }
 
 // ══════════ TOUCH DRAG (iPhone対応) ══════════
-let touchDragEl=null, touchDragIdx=null, touchDragType=null, touchClone=null;
+let touchDragEl=null, touchDragType=null, touchClone=null, touchFromIdx=null;
 
 function initTouchDrag(){
   document.addEventListener('touchstart', e=>{
     const row = e.target.closest('.ed-row');
     if(!row) return;
-    // 長押し判定
-    touchDragEl = row;
     row._touchTimer = setTimeout(()=>{
       startTouchDrag(row, e.touches[0]);
     }, 400);
   }, {passive:true});
 
   document.addEventListener('touchmove', e=>{
-    if(!touchClone) { if(touchDragEl) clearTimeout(touchDragEl._touchTimer); return; }
+    if(touchDragEl) clearTimeout(touchDragEl._touchTimer);
+    if(!touchClone) return;
     e.preventDefault();
     const t = e.touches[0];
-    touchClone.style.top  = (t.clientY - touchClone._offY) + 'px';
-    touchClone.style.left = '10px';
-    touchClone.style.right = '10px';
-    // ハイライト対象を探す
+    touchClone.style.top = (t.clientY - touchClone._offY) + 'px';
     document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
+    // クローンを一時非表示にして下の要素を取得
+    touchClone.style.display = 'none';
     const el = document.elementFromPoint(t.clientX, t.clientY);
+    touchClone.style.display = '';
     const target = el && el.closest('.ed-row');
     if(target && target !== touchDragEl) target.classList.add('drag-over');
   }, {passive:false});
@@ -938,34 +937,53 @@ function initTouchDrag(){
   document.addEventListener('touchend', e=>{
     if(touchDragEl) clearTimeout(touchDragEl._touchTimer);
     if(!touchClone){ touchDragEl=null; return; }
+    // クローンを先に削除
+    touchClone.remove(); touchClone=null;
+    // 元の要素を元に戻す
+    if(touchDragEl){ touchDragEl.style.opacity=''; touchDragEl.style.visibility=''; }
+
     const t = e.changedTouches[0];
+    document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
+
+    // クローン削除後に対象要素を取得
     const el = document.elementFromPoint(t.clientX, t.clientY);
     const target = el && el.closest('.ed-row');
-    if(target && target !== touchDragEl){
+
+    if(target && target !== touchDragEl && touchDragEl && touchDragEl.parentNode){
       const list = [...touchDragEl.parentNode.querySelectorAll('.ed-row')];
       const fromIdx = list.indexOf(touchDragEl);
       const toIdx   = list.indexOf(target);
-      if(touchDragType==='variety') { const v=getVarList(); const[m]=v.splice(fromIdx,1); v.splice(toIdx,0,m); varietyOrder=[...v]; renderSettings(); }
-      else                          { const f=getFdList();  const[m]=f.splice(fromIdx,1); f.splice(toIdx,0,m); fieldMaster=[...f];  renderSettings(); }
+      if(fromIdx>=0 && toIdx>=0 && fromIdx!==toIdx){
+        if(touchDragType==='variety'){ const v=getVarList();const[m]=v.splice(fromIdx,1);v.splice(toIdx,0,m);varietyOrder=[...v];renderSettings(); }
+        else                         { const f=getFdList(); const[m]=f.splice(fromIdx,1);f.splice(toIdx,0,m);fieldMaster=[...f]; renderSettings(); }
+      }
     }
+    touchDragEl=null; touchFromIdx=null;
+  });
+
+  document.addEventListener('touchcancel', ()=>{
+    if(touchClone){ touchClone.remove(); touchClone=null; }
+    if(touchDragEl){ touchDragEl.style.opacity=''; clearTimeout(touchDragEl._touchTimer); touchDragEl=null; }
     document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
-    touchClone.remove(); touchClone=null; touchDragEl=null;
   });
 }
 
 function startTouchDrag(row, touch){
-  // 何リストか判断
   touchDragType = row.closest('#var-list') ? 'variety' : 'field';
-  // クローン作成
-  const clone = row.cloneNode(true);
-  clone.style.cssText = `position:fixed;z-index:999;left:10px;right:10px;opacity:.85;background:var(--g5);border-radius:10px;box-shadow:var(--sh2);pointer-events:none;`;
   const rect = row.getBoundingClientRect();
+  // クローンをbodyに追加（元の要素はそのまま薄くするだけ）
+  const clone = document.createElement('div');
+  clone.className = 'ed-row';
+  clone.style.cssText = `position:fixed;z-index:999;left:10px;right:10px;opacity:.88;background:var(--g5);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none;padding:10px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:600;color:var(--g0);`;
+  clone.textContent = '⠿ ' + (touchDragType==='variety'
+    ? (row.querySelector('.ed-inp')||{value:''}).value
+    : (row.querySelector('.ed-inp')||{value:''}).value);
   clone._offY = touch.clientY - rect.top;
   clone.style.top = (touch.clientY - clone._offY) + 'px';
   document.body.appendChild(clone);
   touchClone = clone;
-  row.style.opacity = '0.3';
   touchDragEl = row;
+  row.style.opacity = '0.3';
   if(navigator.vibrate) navigator.vibrate(30);
 }
 
