@@ -264,6 +264,14 @@
       "field": "エキ",
       "count": 21,
       "note": ""
+    },
+    {
+      "id": 19,
+      "naeRef": 10,
+      "date": "5/8",
+      "field": "久子",
+      "count": 2,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -311,10 +319,15 @@
     {
       "name": "別府小",
       "note": ""
+    },
+    {
+      "name": "久子",
+      "note": ""
     }
   ],
   "hist": {
     "fields": [
+      "久子",
       "エキ",
       "するき１",
       "正人黒山",
@@ -325,9 +338,9 @@
       "大川道",
       "別府小"
     ],
-    "lastField": "エキ",
+    "lastField": "久子",
     "lastHouse": "4",
     "lastVariety": ""
   },
-  "_pid": 19
+  "_pid": 20
 }
