@@ -118,6 +118,13 @@
       "house": "4",
       "variety": "Bごがね",
       "count": 6
+    },
+    {
+      "no": 18,
+      "date": "5/9",
+      "house": "4",
+      "variety": "たいがん",
+      "count": 15
     }
   ],
   "plantData": [
@@ -356,7 +363,7 @@
     ],
     "lastField": "久子",
     "lastHouse": "4",
-    "lastVariety": ""
+    "lastVariety": "たいがん"
   },
   "_pid": 22
 }
