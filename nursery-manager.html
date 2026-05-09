@@ -545,9 +545,20 @@ setInterval(async () => {
   if(_dirty && getToken() && !_saving) await saveToGitHub();
 }, 30000);
 
-// バックグラウンド移行時に保存
+// バックグラウンド移行時に保存、復帰時に最新データを読み込む
 document.addEventListener('visibilitychange', async () => {
-  if(document.visibilityState === 'hidden' && _dirty && getToken()) await saveToGitHub();
+  if(document.visibilityState === 'hidden') {
+    // バックグラウンドへ → 未保存データを保存
+    if(_dirty && getToken()) await saveToGitHub();
+  } else if(document.visibilityState === 'visible') {
+    // フォアグラウンドへ復帰 → 最新データを読み込む（他端末での変更を反映）
+    if(getToken()) {
+      const saveBtn = document.querySelector('.hbtn.save');
+      if(saveBtn){ saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; }
+      await loadFromGitHub();
+      if(saveBtn){ saveBtn.disabled = false; saveBtn.style.opacity = '1'; }
+    }
+  }
 });
 
 // エクスポート・インポート
@@ -833,12 +844,24 @@ function saveRec(){
 }
 
 // ══════════ INIT ══════════
+// まずローカルデータで即表示（画面が白くならないように）
 const loaded = loadLocal();
 renderDash(); renderAll(); refreshFlists(); refreshVlist();
-if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
-// トークンがあればGitHubから最新データを自動読み込み
+
 if(getToken()) {
-  setTimeout(() => loadFromGitHub(), 500);
+  // トークンあり → GitHubから最新データを読み込んでから使用可能にする
+  setSyncStatus('最新データを読込中…');
+  // 保存ボタンを一時無効化（古いデータで上書きしないように）
+  const saveBtn = document.querySelector('.hbtn.save');
+  if(saveBtn){ saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; saveBtn.title = '読込完了後に使用できます'; }
+  setTimeout(async () => {
+    await loadFromGitHub();
+    // 読込完了後に保存ボタンを有効化
+    if(saveBtn){ saveBtn.disabled = false; saveBtn.style.opacity = '1'; saveBtn.title = ''; }
+  }, 300);
+} else {
+  // トークンなし → ローカルデータのみ
+  if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
 }
 </script>
 </body>
