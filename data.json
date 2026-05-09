@@ -118,6 +118,20 @@
       "house": "4",
       "variety": "Bごがね",
       "count": 6
+    },
+    {
+      "no": 18,
+      "date": "5/9",
+      "house": "4",
+      "variety": "たいがん",
+      "count": 15
+    },
+    {
+      "no": 19,
+      "date": "5/9",
+      "house": "中村",
+      "variety": "こがね",
+      "count": 16
     }
   ],
   "plantData": [
@@ -355,8 +369,8 @@
       "別府小"
     ],
     "lastField": "久子",
-    "lastHouse": "4",
-    "lastVariety": ""
+    "lastHouse": "中村",
+    "lastVariety": "こがね"
   },
   "_pid": 22
 }
