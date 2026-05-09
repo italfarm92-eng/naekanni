@@ -1339,9 +1339,13 @@ async function loadFromGitHub() {
     });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const meta = await res.json();
-    const raw = meta.content.replace(/\n/g,'');
-    const decoded = decodeURIComponent(atob(raw).split('').map(c=>('%'+('00'+c.charCodeAt(0).toString(16)).slice(-2))).join(''));
-    const json = JSON.parse(decoded);
+    // Base64 → バイト列 → UTF-8文字列
+    const b64 = meta.content.replace(/\s/g,'');
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+    const text = new TextDecoder('utf-8').decode(bytes);
+    const json = JSON.parse(text);
     if(json.naeData     && json.naeData.length)      naeData      = json.naeData;
     if(json.plantData   && json.plantData.length)    plantData    = json.plantData;
     if(json.varietyOrder&& json.varietyOrder.length) varietyOrder = json.varietyOrder;
@@ -1349,9 +1353,8 @@ async function loadFromGitHub() {
     if(json.hist)                                    hist         = json.hist;
     if(json._pid)                                    _pid         = json._pid;
     if(plantData.length) _pid = Math.max(_pid, Math.max(...plantData.map(p=>p.id))+1);
-    // ローカルにもキャッシュ
     saveLocalOnly();
-    setSyncUI('ok', '読込済');
+    setSyncUI('ok','読込済');
     rerenderBgNoSync();
     toast('✅ GitHubからデータを読み込みました');
   } catch(err) {
@@ -1368,19 +1371,25 @@ async function saveToGitHub() {
   setSyncUI('saving','保存中…');
   try {
     // 現在のSHAを取得
+    let sha = null;
     const resGet = await fetch(GH_API, {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Accept': 'application/vnd.github+json'
       }
     });
-    let sha = null;
     if(resGet.ok) { const m = await resGet.json(); sha = m.sha; }
 
-    const content = {naeData, plantData, varietyOrder, fieldMaster, hist, _pid};
+    // JSON文字列 → UTF-8バイト列 → Base64
+    const text = JSON.stringify({naeData, plantData, varietyOrder, fieldMaster, hist, _pid}, null, 2);
+    const bytes = new TextEncoder().encode(text);
+    let bin = '';
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    const b64 = btoa(bin);
+
     const body = {
       message: 'データ更新 ' + new Date().toLocaleString('ja-JP'),
-      content: btoa(encodeURIComponent(JSON.stringify(content, null, 2)).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x'+p1))),
+      content: b64,
     };
     if(sha) body.sha = sha;
 
@@ -1397,22 +1406,14 @@ async function saveToGitHub() {
       const err = await resPut.json();
       throw new Error(err.message || 'HTTP ' + resPut.status);
     }
-    saveLocalOnly(); // ローカルにもキャッシュ
-    setSyncUI('ok', '保存済');
+    saveLocalOnly();
+    pendingSave = false;
+    setSyncUI('ok','保存済');
     toast('✅ GitHubに保存しました');
   } catch(err) {
     setSyncUI('error','保存失敗');
     toast('❌ 保存失敗: ' + err.message);
   }
-}
-
-function showDataMenu(){
-  document.getElementById('data-menu-overlay').style.display='block';
-  document.getElementById('data-menu').style.display='block';
-}
-function hideDataMenu(){
-  document.getElementById('data-menu-overlay').style.display='none';
-  document.getElementById('data-menu').style.display='none';
 }
 
 // ═══════════════════════ LOCAL STORAGE ═══════════════════════
