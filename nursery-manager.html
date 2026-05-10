@@ -224,6 +224,12 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 .dmenu-item:last-child{border:none}
 .dmenu-item:hover{background:var(--g5)}
 .dmenu-item.red{color:var(--red)}
+/* loading overlay */
+.loading-ov{display:none;position:fixed;inset:0;background:rgba(13,35,24,.7);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.loading-ov.show{display:flex}
+.loading-spinner{width:44px;height:44px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--g3);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{color:#fff;font-size:.88rem;font-weight:500}
 /* toast */
 .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--g0);color:#fff;padding:8px 18px;border-radius:20px;font-size:.76rem;z-index:600;opacity:0;transition:opacity .28s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
@@ -253,6 +259,12 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
   <button class="dmenu-item" onclick="doExport();hideMenu()">📥 バックアップ（JSON）</button>
   <button class="dmenu-item" onclick="doImport();hideMenu()">📤 バックアップから復元</button>
   <button class="dmenu-item red" onclick="doClear();hideMenu()">🗑 データをリセット</button>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-ov" id="loading-ov">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg" id="loading-msg">GitHubから最新データを読込中…</div>
 </div>
 
 <div class="tabs">
@@ -459,6 +471,7 @@ async function loadFromGitHub() {
   const token = getToken();
   if(!token) { doSetToken(); return; }
   setSyncStatus('読込中…');
+  showLoading();
   try {
     const res = await fetch(GH_API + '?t=' + Date.now(), {
       headers:{
@@ -478,6 +491,8 @@ async function loadFromGitHub() {
   } catch(e) {
     setSyncStatus('❌ 読込失敗');
     toast('❌ 読込失敗: ' + e.message);
+  } finally {
+    hideLoading();
   }
 }
 
@@ -601,6 +616,18 @@ function doClear() {
   if(!confirm('すべてのデータをリセットしますか？\nこの操作は取り消せません。'))return;
   localStorage.removeItem(LS_KEY);
   toast('🗑 リセットしました。ページを再読み込みしてください。');
+}
+
+// ══════════ LOADING ══════════
+function showLoading(msg='GitHubから最新データを読込中…'){
+  const ov=document.getElementById('loading-ov');
+  const mg=document.getElementById('loading-msg');
+  if(ov) ov.classList.add('show');
+  if(mg) mg.textContent=msg;
+}
+function hideLoading(){
+  const ov=document.getElementById('loading-ov');
+  if(ov) ov.classList.remove('show');
 }
 
 // ══════════ MENU ══════════
@@ -907,18 +934,16 @@ const loaded = loadLocal();
 renderDash(); renderAll(); refreshFlists(); refreshVlist();
 
 if(getToken()) {
-  // トークンあり → GitHubから最新データを読み込んでから使用可能にする
-  setSyncStatus('最新データを読込中…');
-  // 保存ボタンを一時無効化（古いデータで上書きしないように）
+  // 起動直後にローディング表示（古いデータが見えないように）
+  showLoading('GitHubから最新データを読込中…');
+  setSyncStatus('読込中…');
   const saveBtn = document.querySelector('.hbtn.save');
-  if(saveBtn){ saveBtn.disabled = true; saveBtn.style.opacity = '0.4'; saveBtn.title = '読込完了後に使用できます'; }
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.style.opacity='0.4'; saveBtn.title='読込完了後に使用できます'; }
   setTimeout(async () => {
-    await loadFromGitHub();
-    // 読込完了後に保存ボタンを有効化
-    if(saveBtn){ saveBtn.disabled = false; saveBtn.style.opacity = '1'; saveBtn.title = ''; }
-  }, 300);
+    await loadFromGitHub(); // 内部でhideLoading()が呼ばれる
+    if(saveBtn){ saveBtn.disabled=false; saveBtn.style.opacity='1'; saveBtn.title=''; }
+  }, 200);
 } else {
-  // トークンなし → ローカルデータのみ
   if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
 }
 </script>
