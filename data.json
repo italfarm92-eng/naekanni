@@ -318,6 +318,22 @@
       "field": "ナツエ",
       "count": 16,
       "note": ""
+    },
+    {
+      "id": 24,
+      "naeRef": 13,
+      "date": "5/10",
+      "field": "ナツエ",
+      "count": 2,
+      "note": ""
+    },
+    {
+      "id": 25,
+      "naeRef": 14,
+      "date": "5/10",
+      "field": "ナツエ",
+      "count": 7.5,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -392,5 +408,5 @@
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 24
+  "_pid": 26
 }
