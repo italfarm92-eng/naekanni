@@ -310,6 +310,14 @@
       "field": "久子",
       "count": 5,
       "note": ""
+    },
+    {
+      "id": 23,
+      "naeRef": 19,
+      "date": "5/10",
+      "field": "ナツエ",
+      "count": 16,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -360,10 +368,15 @@
     {
       "name": "久子",
       "note": ""
+    },
+    {
+      "name": "ナツエ",
+      "note": ""
     }
   ],
   "hist": {
     "fields": [
+      "ナツエ",
       "久子",
       "エキ",
       "するき１",
@@ -375,9 +388,9 @@
       "大川道",
       "別府小"
     ],
-    "lastField": "久子",
+    "lastField": "ナツエ",
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 23
+  "_pid": 24
 }
