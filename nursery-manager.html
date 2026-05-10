@@ -235,7 +235,7 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 <body>
 <header>
   <div class="h-left">
-    <div class="h-sub">苗管理 N03 ／ 令和8年5月9日</div>
+    <div class="h-sub">苗管理 N03 ／ ' + toWareki() + '</div>
     <h1>🌱 苗・植え付け管理</h1>
   </div>
   <div class="hbtns">
@@ -623,8 +623,18 @@ function showMenu(){ document.getElementById('dmenu-ov').style.display='block'; 
 function hideMenu(){ document.getElementById('dmenu-ov').style.display='none';  document.getElementById('dmenu').style.display='none'; }
 
 // ══════════ HELPERS ══════════
-const TODAY = new Date(2026,4,9);
-const todayStr = () => '2026-05-09';
+const TODAY = new Date();
+
+// 和暦変換（令和）
+function toWareki(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = d.getMonth()+1;
+  const day = d.getDate();
+  const reiwa = y - 2018; // 令和元年=2019
+  return '令和'+reiwa+'年'+m+'月'+day+'日';
+}
+const todayStr = () => new Date().toISOString().split('T')[0];
 const dateVal  = s => s?s.replace(/\d{4}-(\d{2})-(\d{2})/,(_,m,d)=>`${+m}/${+d}`):'';
 const fmt      = n => n==null?'—':(n%1===0?String(n):(+n).toFixed(1));
 const esc      = s => s.replace(/[^a-zA-Z0-9]/g,'_');
