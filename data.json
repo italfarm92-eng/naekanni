@@ -302,6 +302,14 @@
       "field": "久子",
       "count": 17,
       "note": ""
+    },
+    {
+      "id": 22,
+      "naeRef": 17,
+      "date": "5/9",
+      "field": "久子",
+      "count": 5,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -371,5 +379,5 @@
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 22
+  "_pid": 23
 }
