@@ -908,57 +908,69 @@ function saveRec(){
 }
 
 // ══════════ TOUCH DRAG (iPhone対応) ══════════
-let touchDragEl=null, touchDragType=null, touchClone=null, touchFromIdx=null;
+let touchDragEl=null, touchDragType=null, touchClone=null;
+let touchStartY=0, touchMoved=false;
 
 function initTouchDrag(){
+  // touchstartはpassive:falseで登録（preventDefault可能にするため）
   document.addEventListener('touchstart', e=>{
     const row = e.target.closest('.ed-row');
     if(!row) return;
+    touchMoved = false;
+    touchStartY = e.touches[0].clientY;
+    // 長押し800msでドラッグ開始
     row._touchTimer = setTimeout(()=>{
-      startTouchDrag(row, e.touches[0]);
-    }, 400);
+      if(!touchMoved){
+        startTouchDrag(row, e.touches[0]);
+      }
+    }, 800);
   }, {passive:true});
 
   document.addEventListener('touchmove', e=>{
-    if(touchDragEl) clearTimeout(touchDragEl._touchTimer);
-    if(!touchClone) return;
-    e.preventDefault();
-    const t = e.touches[0];
-    touchClone.style.top = (t.clientY - touchClone._offY) + 'px';
-    document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
-    // クローンを一時非表示にして下の要素を取得
-    touchClone.style.display = 'none';
-    const el = document.elementFromPoint(t.clientX, t.clientY);
-    touchClone.style.display = '';
-    const target = el && el.closest('.ed-row');
-    if(target && target !== touchDragEl) target.classList.add('drag-over');
+    // タイマーキャンセル判定（少し動いたらキャンセル）
+    if(touchDragEl && !touchClone){
+      const dy = Math.abs(e.touches[0].clientY - touchStartY);
+      if(dy > 8){ touchMoved=true; clearTimeout(touchDragEl._touchTimer); }
+    }
+    // ドラッグ中はスクロール禁止＋クローン移動
+    if(touchClone){
+      e.preventDefault();
+      const t = e.touches[0];
+      touchClone.style.top = (t.clientY - touchClone._offY) + 'px';
+      // ハイライト
+      document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
+      touchClone.style.display = 'none';
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      touchClone.style.display = '';
+      const target = el && el.closest('.ed-row');
+      if(target && target !== touchDragEl) target.classList.add('drag-over');
+    }
   }, {passive:false});
 
   document.addEventListener('touchend', e=>{
     if(touchDragEl) clearTimeout(touchDragEl._touchTimer);
     if(!touchClone){ touchDragEl=null; return; }
-    // クローンを先に削除
+
+    // クローン削除・元要素復元
     touchClone.remove(); touchClone=null;
-    // 元の要素を元に戻す
-    if(touchDragEl){ touchDragEl.style.opacity=''; touchDragEl.style.visibility=''; }
+    if(touchDragEl) touchDragEl.style.opacity='';
 
     const t = e.changedTouches[0];
     document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
 
-    // クローン削除後に対象要素を取得
     const el = document.elementFromPoint(t.clientX, t.clientY);
     const target = el && el.closest('.ed-row');
 
     if(target && target !== touchDragEl && touchDragEl && touchDragEl.parentNode){
       const list = [...touchDragEl.parentNode.querySelectorAll('.ed-row')];
-      const fromIdx = list.indexOf(touchDragEl);
-      const toIdx   = list.indexOf(target);
-      if(fromIdx>=0 && toIdx>=0 && fromIdx!==toIdx){
-        if(touchDragType==='variety'){ const v=getVarList();const[m]=v.splice(fromIdx,1);v.splice(toIdx,0,m);varietyOrder=[...v];renderSettings(); }
-        else                         { const f=getFdList(); const[m]=f.splice(fromIdx,1);f.splice(toIdx,0,m);fieldMaster=[...f]; renderSettings(); }
+      const fi = list.indexOf(touchDragEl);
+      const ti = list.indexOf(target);
+      if(fi>=0 && ti>=0 && fi!==ti){
+        if(touchDragType==='variety'){ const v=getVarList();const[m]=v.splice(fi,1);v.splice(ti,0,m);varietyOrder=[...v];renderSettings(); }
+        else                         { const f=getFdList(); const[m]=f.splice(fi,1);f.splice(ti,0,m);fieldMaster=[...f]; renderSettings(); }
       }
     }
-    touchDragEl=null; touchFromIdx=null;
+    touchDragEl=null;
   });
 
   document.addEventListener('touchcancel', ()=>{
@@ -970,21 +982,18 @@ function initTouchDrag(){
 
 function startTouchDrag(row, touch){
   touchDragType = row.closest('#var-list') ? 'variety' : 'field';
+  const name = (row.querySelector('.ed-inp')||{value:''}).value || '';
   const rect = row.getBoundingClientRect();
-  // クローンをbodyに追加（元の要素はそのまま薄くするだけ）
   const clone = document.createElement('div');
-  clone.className = 'ed-row';
-  clone.style.cssText = `position:fixed;z-index:999;left:10px;right:10px;opacity:.88;background:var(--g5);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none;padding:10px;font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:600;color:var(--g0);`;
-  clone.textContent = '⠿ ' + (touchDragType==='variety'
-    ? (row.querySelector('.ed-inp')||{value:''}).value
-    : (row.querySelector('.ed-inp')||{value:''}).value);
+  clone.style.cssText = `position:fixed;z-index:999;left:10px;right:10px;padding:12px 14px;opacity:.9;background:var(--g4);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);pointer-events:none;font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;color:var(--g0);display:flex;align-items:center;gap:8px;`;
+  clone.innerHTML = '<span style="font-size:1.2rem">⠿</span>' + name;
   clone._offY = touch.clientY - rect.top;
   clone.style.top = (touch.clientY - clone._offY) + 'px';
   document.body.appendChild(clone);
   touchClone = clone;
   touchDragEl = row;
-  row.style.opacity = '0.3';
-  if(navigator.vibrate) navigator.vibrate(30);
+  row.style.opacity = '0.25';
+  if(navigator.vibrate) navigator.vibrate([30,10,30]);
 }
 
 // ══════════ INIT ══════════
