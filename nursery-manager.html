@@ -235,7 +235,7 @@ header{background:var(--g0);color:#fff;padding:10px 14px;position:sticky;top:0;z
 <body>
 <header>
   <div class="h-left">
-    <div class="h-sub">苗管理 N03 ／ ' + toWareki() + '</div>
+    <div class="h-sub" id="h-date">苗管理 N03</div>
     <h1>🌱 苗・植え付け管理</h1>
   </div>
   <div class="hbtns">
@@ -947,6 +947,9 @@ if(_token) {
   hideLoading(); // トークンなし → ローディングを確実に消す
   if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動 — ⋯からトークン設定'); }
 }
+
+// 日付を自動設定
+document.getElementById('h-date').textContent = '苗管理 N03 ／ ' + toWareki();
 </script>
 </body>
 </html>
