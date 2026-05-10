@@ -802,14 +802,10 @@ function renderSettings(){
   let body='';
   if(settingsTab==='variety'){
     body=`<div class="set-section">
-  <div class="set-head">品種マスタ（↑↓で並替・長押しでドラッグ） <button class="set-head-btn" onclick="saveVarOrder()">✅ 保存</button></div>
+  <div class="set-head">品種マスタ（↑↓で並べ替え） <button class="set-head-btn" onclick="saveVarOrder()">✅ 保存</button></div>
   <div id="var-list">
     ${varietyOrder.map((v,i)=>`
-      <div class="ed-row" draggable="true"
-        ondragstart="vDS(event,${i})"
-        ondragover="event.preventDefault();this.classList.add('drag-over')"
-        ondragleave="this.classList.remove('drag-over')"
-        ondrop="vDrop(event,${i})">
+      <div class="ed-row">
         <div class="ed-arrows">
           <button class="ed-arr" onclick="moveV(${i},-1)">↑</button>
           <button class="ed-arr" onclick="moveV(${i},1)">↓</button>
@@ -825,14 +821,10 @@ function renderSettings(){
 </div>`;
   } else if(settingsTab==='fieldMaster'){
     body=`<div class="set-section">
-  <div class="set-head">畑マスタ（↑↓で並替・長押しでドラッグ） <button class="set-head-btn" onclick="saveFdMaster()">✅ 保存</button></div>
+  <div class="set-head">畑マスタ（↑↓で並べ替え） <button class="set-head-btn" onclick="saveFdMaster()">✅ 保存</button></div>
   <div id="field-list">
     ${fieldMaster.map((f,i)=>`
-      <div class="ed-row" draggable="true"
-        ondragstart="fdDS(event,${i})"
-        ondragover="event.preventDefault();this.classList.add('drag-over')"
-        ondragleave="this.classList.remove('drag-over')"
-        ondrop="fdDrop(event,${i})">
+      <div class="ed-row">
         <div class="ed-arrows">
           <button class="ed-arr" onclick="moveFd(${i},-1)">↑</button>
           <button class="ed-arr" onclick="moveFd(${i},1)">↓</button>
@@ -907,94 +899,7 @@ function saveRec(){
   closeModal(); rerenderBg();
 }
 
-// ══════════ TOUCH DRAG (iPhone対応) ══════════
-let touchDragEl=null, touchDragType=null, touchClone=null;
-let touchStartY=0, touchMoved=false;
-
-function initTouchDrag(){
-  // touchstartはpassive:falseで登録（preventDefault可能にするため）
-  document.addEventListener('touchstart', e=>{
-    const row = e.target.closest('.ed-row');
-    if(!row) return;
-    touchMoved = false;
-    touchStartY = e.touches[0].clientY;
-    // 長押し800msでドラッグ開始
-    row._touchTimer = setTimeout(()=>{
-      if(!touchMoved){
-        startTouchDrag(row, e.touches[0]);
-      }
-    }, 2000);
-  }, {passive:true});
-
-  document.addEventListener('touchmove', e=>{
-    // タイマーキャンセル判定（少し動いたらキャンセル）
-    if(touchDragEl && !touchClone){
-      const dy = Math.abs(e.touches[0].clientY - touchStartY);
-      if(dy > 8){ touchMoved=true; clearTimeout(touchDragEl._touchTimer); }
-    }
-    // ドラッグ中はスクロール禁止＋クローン移動
-    if(touchClone){
-      e.preventDefault();
-      const t = e.touches[0];
-      touchClone.style.top = (t.clientY - touchClone._offY) + 'px';
-      // ハイライト
-      document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
-      touchClone.style.display = 'none';
-      const el = document.elementFromPoint(t.clientX, t.clientY);
-      touchClone.style.display = '';
-      const target = el && el.closest('.ed-row');
-      if(target && target !== touchDragEl) target.classList.add('drag-over');
-    }
-  }, {passive:false});
-
-  document.addEventListener('touchend', e=>{
-    if(touchDragEl) clearTimeout(touchDragEl._touchTimer);
-    if(!touchClone){ touchDragEl=null; return; }
-
-    // クローン削除・元要素復元
-    touchClone.remove(); touchClone=null;
-    if(touchDragEl) touchDragEl.style.opacity='';
-
-    const t = e.changedTouches[0];
-    document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
-
-    const el = document.elementFromPoint(t.clientX, t.clientY);
-    const target = el && el.closest('.ed-row');
-
-    if(target && target !== touchDragEl && touchDragEl && touchDragEl.parentNode){
-      const list = [...touchDragEl.parentNode.querySelectorAll('.ed-row')];
-      const fi = list.indexOf(touchDragEl);
-      const ti = list.indexOf(target);
-      if(fi>=0 && ti>=0 && fi!==ti){
-        if(touchDragType==='variety'){ const v=getVarList();const[m]=v.splice(fi,1);v.splice(ti,0,m);varietyOrder=[...v];renderSettings(); }
-        else                         { const f=getFdList(); const[m]=f.splice(fi,1);f.splice(ti,0,m);fieldMaster=[...f]; renderSettings(); }
-      }
-    }
-    touchDragEl=null;
-  });
-
-  document.addEventListener('touchcancel', ()=>{
-    if(touchClone){ touchClone.remove(); touchClone=null; }
-    if(touchDragEl){ touchDragEl.style.opacity=''; clearTimeout(touchDragEl._touchTimer); touchDragEl=null; }
-    document.querySelectorAll('.ed-row').forEach(r=>r.classList.remove('drag-over'));
-  });
-}
-
-function startTouchDrag(row, touch){
-  touchDragType = row.closest('#var-list') ? 'variety' : 'field';
-  const name = (row.querySelector('.ed-inp')||{value:''}).value || '';
-  const rect = row.getBoundingClientRect();
-  const clone = document.createElement('div');
-  clone.style.cssText = `position:fixed;z-index:999;left:10px;right:10px;padding:12px 14px;opacity:.9;background:var(--g4);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);pointer-events:none;font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;color:var(--g0);display:flex;align-items:center;gap:8px;`;
-  clone.innerHTML = '<span style="font-size:1.2rem">⠿</span>' + name;
-  clone._offY = touch.clientY - rect.top;
-  clone.style.top = (touch.clientY - clone._offY) + 'px';
-  document.body.appendChild(clone);
-  touchClone = clone;
-  touchDragEl = row;
-  row.style.opacity = '0.25';
-  if(navigator.vibrate) navigator.vibrate([30,10,30]);
-}
+// タッチドラッグは廃止（↑↓ボタンで並べ替え）
 
 // ══════════ INIT ══════════
 // まずローカルデータで即表示（画面が白くならないように）
@@ -1016,7 +921,6 @@ if(getToken()) {
   // トークンなし → ローカルデータのみ
   if(loaded){ setSyncStatus('ローカル読込済'); } else { setSyncStatus('初回起動'); }
 }
-initTouchDrag();
 </script>
 </body>
 </html>
