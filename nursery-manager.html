@@ -845,6 +845,12 @@ function renderSettings(){
     <input class="add-inp" id="new-var" placeholder="新しい品種名を入力">
     <button class="add-btn" onclick="addV()">＋追加</button>
   </div>
+</div>
+<div style="background:var(--am2);border-radius:10px;padding:11px 13px;margin-top:8px">
+  <div style="font-size:.73rem;font-weight:700;color:#7a5000;margin-bottom:8px">📋 品種名を一括変換してGitHubに保存</div>
+  <button onclick="runMigration()" style="width:100%;padding:10px;background:var(--am);color:#fff;border:none;border-radius:9px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">
+    🔄 こがね→黄金 / Bごがね→B黄金 / まさり→B紅まさり に変換して保存
+  </button>
 </div>`;
   } else if(settingsTab==='fieldMaster'){
     body=`<div class="set-section">
@@ -896,6 +902,37 @@ function saveFdMaster(){ const fds=getFdList();if(!fds.length){toast('⚠ 畑が
 function moveFd(i,dir){ const f=getFdList();const j=i+dir;if(j<0||j>=f.length)return;[f[i],f[j]]=[f[j],f[i]];fieldMaster=[...f];renderSettings(); }
 function addFd(){ const inp=document.getElementById('new-field');if(!inp)return; const name=inp.value.trim();if(!name){toast('⚠ 畑名を入力');return;} const cur=getFdList();if(cur.some(f=>f.name===name)){toast('⚠ すでに存在します');return;} fieldMaster=[...cur,{name,note:''}];inp.value='';renderSettings();toast(`✅「${name}」を追加`);refreshFlists(); }
 function removeFd(i){ const f=getFdList();const fd=f[i];if(!confirm(`「${fd.name}」を削除しますか？`))return; fieldMaster=f.filter((_,j)=>j!==i);renderSettings();toast(`削除しました`);refreshFlists(); }
+
+// ══════════ MIGRATION ══════════
+async function runMigration(){
+  const renames = {
+    'こがね':   '黄金',
+    'Bごがね':  'B黄金',
+    'Bこがね':  'B黄金',
+    'まさり':   'B紅まさり',
+    '種まさり': '種B紅まさり',
+  };
+  const preview = Object.entries(renames).map(([a,b])=>`${a} → ${b}`).join('
+');
+  if(!confirm('以下の品種名を変換してGitHubに保存しますか？
+
+' + preview)) return;
+
+  let changed = 0;
+  // naeDataの品種名を変換
+  naeData.forEach(n => {
+    if(renames[n.variety]){ n.variety = renames[n.variety]; changed++; }
+  });
+  // varietyOrderを変換
+  varietyOrder = varietyOrder.map(v => renames[v] || v);
+  // 重複除去
+  varietyOrder = [...new Set(varietyOrder)];
+
+  toast(`✅ ${changed}件の品種名を変換しました。GitHubに保存中…`);
+  rerenderBg();
+  await saveToGitHub();
+  renderSettings();
+}
 
 // ══════════ TABS ══════════
 const pageMap={dash:'page-dash',stock:'page-stock',nae:'page-nae',plant:'page-plant',field:'page-field',settings:'page-settings'};
