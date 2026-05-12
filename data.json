@@ -342,6 +342,14 @@
       "field": "正人黒山",
       "count": 6,
       "note": ""
+    },
+    {
+      "id": 27,
+      "naeRef": 16,
+      "date": "5/12",
+      "field": "トシ",
+      "count": 16,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -396,10 +404,15 @@
     {
       "name": "ナツエ",
       "note": ""
+    },
+    {
+      "name": "トシ",
+      "note": ""
     }
   ],
   "hist": {
     "fields": [
+      "トシ",
       "正人黒山",
       "ナツエ",
       "久子",
@@ -412,9 +425,9 @@
       "大川道",
       "別府小"
     ],
-    "lastField": "正人黒山",
+    "lastField": "トシ",
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 27
+  "_pid": 28
 }
