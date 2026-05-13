@@ -739,22 +739,107 @@ const SSORTS=[['no_asc','苗No↑'],['no_desc','苗No↓'],['variety','品種'],
 function renderStock(){
   const el=document.getElementById('page-stock');
   const rows=naeData.map(r=>({...r,planted:plantedForNae(r.no),rem:r.count-plantedForNae(r.no)}));
-  rows.sort((a,b)=>{ if(stockSort==='no_asc')return a.no-b.no; if(stockSort==='no_desc')return b.no-a.no; if(stockSort==='variety')return allVarieties().indexOf(a.variety)-allVarieties().indexOf(b.variety); if(stockSort==='house')return a.house.localeCompare(b.house,'ja'); if(stockSort==='count')return b.count-a.count; if(stockSort==='rem_desc')return b.rem-a.rem; if(stockSort==='rem_asc')return a.rem-b.rem; return 0; });
-  // 合計計算
-  const totalNae=rows.reduce((s,r)=>s+r.count,0);
-  const totalPlanted=rows.reduce((s,r)=>s+r.planted,0);
-  const totalRem=rows.reduce((s,r)=>s+r.rem,0);
-  el.innerHTML=`
-    <div style="background:var(--white);border-radius:12px;box-shadow:var(--sh);padding:11px 13px;margin-bottom:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
-      <div><div style="font-size:.62rem;color:var(--sub);margin-bottom:3px">採り合計</div><div style="font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--g2)">${fmt(totalNae)}<span style="font-size:.65rem;font-weight:400">箱</span></div></div>
-      <div><div style="font-size:.62rem;color:var(--sub);margin-bottom:3px">植え合計</div><div style="font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--am)">${fmt(totalPlanted)}<span style="font-size:.65rem;font-weight:400">箱</span></div></div>
-      <div><div style="font-size:.62rem;color:var(--sub);margin-bottom:3px">残り合計</div><div style="font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:${totalRem>0?'var(--g2)':'var(--red)'}">${fmt(totalRem)}<span style="font-size:.65rem;font-weight:400">箱</span></div></div>
-    </div>
-    <div class="sort-bar"><span class="sort-lbl">並び：</span>${SSORTS.map(([k,l])=>`<button class="spill ${stockSort===k?'active':''}" onclick="stockSort='${k}';renderStock()">${l}</button>`).join('')}</div>${rows.map(r=>`<div class="scard"><div class="scard-row"><div class="scard-no">No.${r.no}</div><div class="scard-info" onclick="openCI(${r.no})" style="cursor:pointer"><div class="scard-variety">${r.variety}</div><div class="scard-meta"><span class="tag h">H${r.house}</span><span class="tag">${r.date}</span></div></div><div class="scard-right" onclick="openCI(${r.no})" style="cursor:pointer"><div class="scard-nums">採${fmt(r.count)} 植${fmt(r.planted)}</div><span class="rb ${rbCls(r.rem)}">${rbLbl(r.rem)}</span></div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${r.rem>0?`<button class="pbtn" style="font-size:.68rem;padding:5px 8px" onclick="openCI(${r.no})">🌾</button>`:''}<button class="ibtn" onclick="editNae(${r.no})">✏️</button></div></div></div>`).join('')}<div class="stitle">品種別まとめ</div><div style="background:var(--white);border-radius:12px;box-shadow:var(--sh);overflow:hidden">${allVarieties().filter(v=>naeTotalByVar(v)>0).map(v=>{ const total=naeTotalByVar(v),planted=naePlantedByVar(v),rem=total-planted,pc=total>0?Math.min(100,Math.round(planted/total*100)):0; return `<div style="display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid #f0ede6;gap:10px"><div style="flex:1"><div style="font-weight:600;font-size:.85rem">${v}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px"><span class="tag">採${fmt(total)}</span><span class="tag am">植${fmt(planted)}</span><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span></div></div><div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--sub)">${pc}%</div></div>`; }).join('')}</div>`;
+  rows.sort((a,b)=>{
+    if(stockSort==='no_asc')   return a.no-b.no;
+    if(stockSort==='no_desc')  return b.no-a.no;
+    if(stockSort==='variety')  return allVarieties().indexOf(a.variety)-allVarieties().indexOf(b.variety);
+    if(stockSort==='house')    return a.house.localeCompare(b.house,'ja');
+    if(stockSort==='count')    return b.count-a.count;
+    if(stockSort==='rem_desc') return b.rem-a.rem;
+    if(stockSort==='rem_asc')  return a.rem-b.rem;
+    return 0;
+  });
+
+  const totalNae     = rows.reduce((s,r)=>s+r.count,0);
+  const totalPlanted = rows.reduce((s,r)=>s+r.planted,0);
+  const totalRem     = rows.reduce((s,r)=>s+r.rem,0);
+  const totalPc      = totalNae>0?Math.min(100,Math.round(totalPlanted/totalNae*100)):0;
+  const activeRows   = rows.filter(r=>r.rem>0);
+
+  // 品種別集計
+  const byVar={};
+  rows.forEach(r=>{
+    if(!byVar[r.variety]) byVar[r.variety]={total:0,planted:0,rem:0,naes:[]};
+    byVar[r.variety].total   += r.count;
+    byVar[r.variety].planted += r.planted;
+    byVar[r.variety].rem     += r.rem;
+    if(r.rem>0) byVar[r.variety].naes.push(r);
+  });
+  const varEntries=Object.entries(byVar).filter(([,v])=>v.rem>0).sort((a,b)=>b[1].rem-a[1].rem);
+
+  // ─── ① サマリー（残り箱数のみ） ───
+  let html = '<div style="background:var(--g2);border-radius:14px;box-shadow:0 4px 20px rgba(13,35,24,.18);padding:16px;margin-bottom:12px;color:#fff;text-align:center">';
+  html += '<div style="font-size:.68rem;opacity:.7;margin-bottom:8px;letter-spacing:.08em">📦 現在庫 残り合計</div>';
+  html += '<div style="font-family:\'Space Mono\',monospace;font-size:2.4rem;font-weight:700;line-height:1">'+fmt(totalRem)+'<span style="font-size:1rem;font-weight:400;opacity:.8"> 箱</span></div>';
+  html += '<div style="font-size:.68rem;opacity:.65;margin-top:6px">苗No '+activeRows.length+'件 ／ 進捗 '+totalPc+'%</div>';
+  html += '<div style="background:rgba(255,255,255,.2);border-radius:8px;height:8px;overflow:hidden;margin-top:10px"><div style="width:'+totalPc+'%;height:100%;background:#fff;border-radius:8px;transition:width .5s"></div></div>';
+  html += '</div>';
+
+  // ─── ② 品種別 現在庫（タップで苗No一覧展開） ───
+  html += '<div class="stitle">② 品種別 現在庫</div>';
+  if(varEntries.length===0){
+    html += '<div style="background:var(--white);border-radius:12px;padding:16px;text-align:center;color:var(--sub);box-shadow:var(--sh)">すべて完植です 🎉</div>';
+  } else {
+    varEntries.forEach(([name,v])=>{
+      const pc=v.total>0?Math.min(100,Math.round(v.planted/v.total*100)):0;
+      const barColor = pc>=90?'var(--red)':pc>=60?'var(--am)':'var(--g3)';
+      const vid='sv_'+name.replace(/[^a-zA-Z0-9]/g,'_');
+      html += '<div style="background:var(--white);border-radius:12px;box-shadow:var(--sh);overflow:hidden;margin-bottom:8px">';
+      // ヘッダー（タップで展開）
+      html += '<div onclick="toggleSV(\''+vid+'\')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer">';
+      html += '<span style="font-weight:700;font-size:.92rem">'+name+'</span>';
+      html += '<div style="display:flex;align-items:center;gap:10px">';
+      html += '<span style="font-family:\'Space Mono\',monospace;font-size:1.1rem;font-weight:700;color:'+barColor+'">'+fmt(v.rem)+'<span style="font-size:.7rem;font-weight:400;color:var(--sub)">箱</span></span>';
+      html += '<span style="color:var(--sub);font-size:.9rem">▾</span>';
+      html += '</div></div>';
+      // プログレスバー
+      html += '<div style="height:5px;background:#e8e3da;margin:0 14px 10px"><div style="width:'+pc+'%;height:100%;background:'+barColor+';transition:width .4s;border-radius:3px"></div></div>';
+      // 展開：苗No一覧
+      html += '<div id="'+vid+'" style="display:none;border-top:1px solid var(--bdr)">';
+      v.naes.forEach(r=>{
+        html += '<div style="display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid #f0ede6;gap:9px;font-size:.82rem">';
+        html += '<div style="background:var(--g2);color:#fff;font-family:\'Space Mono\',monospace;font-size:.75rem;font-weight:700;padding:3px 7px;border-radius:7px;flex-shrink:0">No.'+r.no+'</div>';
+        html += '<div style="flex:1"><span class="tag h">H'+r.house+'</span> <span class="tag" style="margin-left:3px">'+r.date+'</span></div>';
+        html += '<span class="rb rok" style="font-size:.75rem;padding:3px 9px">残'+fmt(r.rem)+'箱</span>';
+        html += '<button class="pbtn" style="font-size:.68rem;padding:5px 8px;flex-shrink:0" onclick="openCI('+r.no+')">🌾</button>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '</div>';
+    });
+  }
+
+  // ─── ③ 苗No別（在庫ありのみ） ───
+  html += '<div class="stitle">③ 苗No別 個別在庫</div>';
+  html += '<div class="sort-bar"><span class="sort-lbl">並び：</span>';
+  SSORTS.forEach(([k,l])=>{
+    html += '<button class="spill '+(stockSort===k?'active':'')+'" onclick="stockSort=\''+k+'\';renderStock()">'+l+'</button>';
+  });
+  html += '</div>';
+  if(activeRows.length===0){
+    html += '<div style="background:var(--white);border-radius:12px;padding:16px;text-align:center;color:var(--sub);box-shadow:var(--sh)">すべて完植です 🎉</div>';
+  } else {
+    activeRows.forEach(r=>{
+      html += '<div class="scard"><div class="scard-row">';
+      html += '<div class="scard-no">No.'+r.no+'</div>';
+      html += '<div class="scard-info" onclick="openCI('+r.no+')" style="cursor:pointer"><div class="scard-variety">'+r.variety+'</div><div class="scard-meta"><span class="tag h">H'+r.house+'</span><span class="tag">'+r.date+'</span></div></div>';
+      html += '<div class="scard-right" onclick="openCI('+r.no+')" style="cursor:pointer"><div class="scard-nums">採'+fmt(r.count)+' 植'+fmt(r.planted)+'</div><span class="rb rok" style="font-size:.75rem;padding:3px 10px">残 '+fmt(r.rem)+'箱</span></div>';
+      html += '<div style="display:flex;gap:3px;align-items:center;flex-shrink:0"><button class="pbtn" style="font-size:.68rem;padding:5px 8px" onclick="openCI('+r.no+')">🌾</button><button class="ibtn" onclick="editNae('+r.no+')">✏️</button></div>';
+      html += '</div></div>';
+    });
+  }
+
+  el.innerHTML = html;
 }
 
-// ══════════ NAE LIST ══════════
-let naeSort='no_asc',naeGroup='variety',naeSearch='';
+function toggleSV(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+
+let naeSort='no_asc', naeGroup='variety', naeSearch='';
 const NAESORTS=[['no_asc','苗No↑'],['no_desc','苗No↓'],['variety','品種'],['count','箱数'],['rem','残り']];
 function renderNae(){
   const se=document.getElementById('nae-search');if(se)naeSearch=se.value.toLowerCase();
