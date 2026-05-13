@@ -688,7 +688,54 @@ function renderStock(){
     return 0;
   });
   const visibleRows = rows.filter(r => r.rem > 0);
+
+  // 品種別集計（在庫残りあるものだけ）
+  const varSummary = allVarieties().map(v=>{
+    const total=naeTotalByVar(v), planted=naePlantedByVar(v), rem=total-planted;
+    return {v, total, planted, rem};
+  }).filter(r=>r.rem>0);
+  const totalRem = visibleRows.reduce((s,r)=>s+r.rem, 0);
+  const totalAll = rows.reduce((s,r)=>s+r.count, 0);
+  const totalPlanted = rows.reduce((s,r)=>s+r.planted, 0);
+  const overallPc = totalAll>0 ? Math.min(100,Math.round(totalPlanted/totalAll*100)) : 0;
+
   el.innerHTML=`
+    <!-- ① 全体サマリー -->
+    <div style="background:var(--g1);border-radius:13px;padding:14px 16px;margin-bottom:12px;color:#fff">
+      <div style="font-size:.65rem;opacity:.65;letter-spacing:.1em;margin-bottom:6px">📦 現在庫サマリー</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+        <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;line-height:1">${fmt(totalRem)}</div>
+        <div style="font-size:.75rem;opacity:.75">箱 残り（${visibleRows.length}苗No）</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:6px;height:6px;overflow:hidden;margin-bottom:4px">
+        <div style="height:100%;border-radius:6px;background:var(--g3);width:${overallPc}%"></div>
+      </div>
+      <div style="font-size:.65rem;opacity:.65">植付済 ${overallPc}%（採${fmt(totalAll)}箱 / 植${fmt(totalPlanted)}箱）</div>
+    </div>
+
+    <!-- ② 品種別在庫カード -->
+    <div class="stitle">品種別 現在庫</div>
+    <div style="background:var(--white);border-radius:13px;box-shadow:var(--sh);overflow:hidden;margin-bottom:14px">
+      ${varSummary.map(({v,total,planted,rem})=>{
+        const pc=total>0?Math.min(100,Math.round(planted/total*100)):0;
+        const barColor = pc>=90?'#b83232': pc>=60?'#d4941a':'#4aaa78';
+        return `<div style="padding:11px 14px;border-bottom:1px solid #f0ede6">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:700;font-size:.88rem">${v}</div>
+            <div style="font-family:'Space Mono',monospace;font-weight:700;font-size:1.1rem;color:var(--g2)">${fmt(rem)}<span style="font-size:.65rem;color:var(--sub);font-weight:400"> 箱</span></div>
+          </div>
+          <div style="background:#e8e3da;border-radius:5px;height:5px;overflow:hidden;margin-bottom:5px">
+            <div style="height:100%;border-radius:5px;background:${barColor};width:${pc}%;transition:width .4s"></div>
+          </div>
+          <div style="display:flex;gap:6px;font-size:.66rem;color:var(--sub)">
+            <span>採 ${fmt(total)}箱</span><span>植 ${fmt(planted)}箱</span><span style="color:${barColor};font-weight:700">植付 ${pc}%</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- ③ 個別苗Noリスト -->
+    <div class="stitle">苗No 個別在庫</div>
     <div class="sort-bar"><span class="sort-lbl">並び：</span>${SSORTS.map(([k,l])=>`<button class="spill ${stockSort===k?'active':''}" onclick="stockSort='${k}';renderStock()">${l}</button>`).join('')}</div>
     ${visibleRows.map(r=>`
       <div class="scard">
@@ -703,27 +750,12 @@ function renderStock(){
             <span class="rb ${rbCls(r.rem)}">${rbLbl(r.rem)}</span>
           </div>
           <div style="display:flex;gap:3px;align-items:center;flex-shrink:0">
-            ${r.rem>0?`<button class="pbtn" style="font-size:.68rem;padding:5px 8px" onclick="openCI(${r.no})">🌾</button>`:''}
+            <button class="pbtn" style="font-size:.68rem;padding:5px 8px" onclick="openCI(${r.no})">🌾</button>
             <button class="ibtn" onclick="editNae(${r.no})">✏️</button>
           </div>
         </div>
       </div>`).join('')}
-    <div class="stitle">品種別まとめ</div>
-    <div style="background:var(--white);border-radius:12px;box-shadow:var(--sh);overflow:hidden">
-      ${allVarieties().filter(v=>naeTotalByVar(v)>0).map(v=>{
-        const total=naeTotalByVar(v),planted=naePlantedByVar(v),rem=total-planted;
-        const pc=total>0?Math.min(100,Math.round(planted/total*100)):0;
-        return `<div style="display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid #f0ede6;gap:10px">
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:.85rem">${v}</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px">
-              <span class="tag">採${fmt(total)}</span><span class="tag am">植${fmt(planted)}</span><span class="rb ${rbCls(rem)}">${rbLbl(rem)}</span>
-            </div>
-          </div>
-          <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--sub)">${pc}%</div>
-        </div>`;
-      }).join('')}
-    </div>`;
+  `;
 }
 
 // ═══════════════════════ NAE LIST ═══════════════════════
@@ -1082,7 +1114,7 @@ function vDrop(e,i){
   e.preventDefault(); e.currentTarget.classList.remove('drag-over');
   if(vDragIdx===null||vDragIdx===i)return;
   const v=getVarList(); const [m]=v.splice(vDragIdx,1); v.splice(i,0,m);
-  varietyOrder=[...v]; vDragIdx=null; renderSettings();
+  varietyOrder=[...v]; vDragIdx=null; renderSettings(); saveLocal();
 }
 function saveVarOrder(){
   const v=getVarList(); if(!v.length){toast('⚠ 品種が空です');return;}
@@ -1092,19 +1124,19 @@ function saveVarOrder(){
 }
 function moveV(i,dir){
   const v=getVarList(); const j=i+dir; if(j<0||j>=v.length)return;
-  [v[i],v[j]]=[v[j],v[i]]; varietyOrder=[...v]; renderSettings();
+  [v[i],v[j]]=[v[j],v[i]]; varietyOrder=[...v]; renderSettings(); saveLocal();
 }
 function addV(){
   const inp=document.getElementById('new-var');if(!inp)return;
   const name=inp.value.trim(); if(!name){toast('⚠ 品種名を入力');return;}
   const cur=getVarList(); if(cur.includes(name)){toast('⚠ すでに存在します');return;}
-  varietyOrder=[...cur,name]; inp.value=''; renderSettings(); toast(`✅「${name}」を追加`);
+  varietyOrder=[...cur,name]; inp.value=''; renderSettings(); saveLocal(); toast(`✅「${name}」を追加`);
 }
 function removeV(i){
   const v=getVarList(); const name=v[i];
   if(naeData.some(n=>n.variety===name)){toast(`⚠「${name}」は苗データで使用中`);return;}
   if(!confirm(`「${name}」を削除しますか？`))return;
-  varietyOrder=v.filter((_,j)=>j!==i); renderSettings(); toast(`「${name}」を削除しました`);
+  varietyOrder=v.filter((_,j)=>j!==i); renderSettings(); saveLocal(); toast(`「${name}」を削除しました`);
 }
 
 // ── Field master editor ──
