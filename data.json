@@ -139,6 +139,13 @@
       "house": "3",
       "variety": "B紅まさり",
       "count": 7
+    },
+    {
+      "no": 21,
+      "date": "5/11",
+      "house": "3",
+      "variety": "みちしずく",
+      "count": 10
     }
   ],
   "plantData": [
@@ -434,8 +441,8 @@
       "別府小"
     ],
     "lastField": "トシ",
-    "lastHouse": "中村",
-    "lastVariety": "黄金"
+    "lastHouse": "3",
+    "lastVariety": "みちしずく"
   },
   "_pid": 28
 }
