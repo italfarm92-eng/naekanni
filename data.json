@@ -408,6 +408,14 @@
       "field": "小学校",
       "count": 10,
       "note": ""
+    },
+    {
+      "id": 30,
+      "naeRef": 17,
+      "date": "5/13",
+      "field": "小学校",
+      "count": 1,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -492,5 +500,5 @@
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 30
+  "_pid": 31
 }
