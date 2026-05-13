@@ -132,6 +132,13 @@
       "house": "中村",
       "variety": "黄金",
       "count": 16
+    },
+    {
+      "no": 20,
+      "date": "5/10",
+      "house": "中村",
+      "variety": "黄金",
+      "count": 41
     }
   ],
   "plantData": [
