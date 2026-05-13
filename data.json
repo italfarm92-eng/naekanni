@@ -153,6 +153,13 @@
       "house": "中村",
       "variety": "みちしずく",
       "count": 10
+    },
+    {
+      "no": 23,
+      "date": "5/12",
+      "house": "中村",
+      "variety": "黄金",
+      "count": 10
     }
   ],
   "plantData": [
@@ -449,7 +456,7 @@
     ],
     "lastField": "トシ",
     "lastHouse": "中村",
-    "lastVariety": "みちしずく"
+    "lastVariety": "黄金"
   },
   "_pid": 28
 }
