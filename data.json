@@ -146,6 +146,13 @@
       "house": "3",
       "variety": "みちしずく",
       "count": 10
+    },
+    {
+      "no": 22,
+      "date": "5/12",
+      "house": "中村",
+      "variety": "みちしずく",
+      "count": 10
     }
   ],
   "plantData": [
@@ -441,7 +448,7 @@
       "別府小"
     ],
     "lastField": "トシ",
-    "lastHouse": "3",
+    "lastHouse": "中村",
     "lastVariety": "みちしずく"
   },
   "_pid": 28
