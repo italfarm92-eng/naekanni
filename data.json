@@ -32,7 +32,7 @@
       "no": 5,
       "date": "5/1",
       "house": "3",
-      "variety": "B紅まさり",
+      "variety": "紅まさり",
       "count": 7
     },
     {
@@ -46,14 +46,14 @@
       "no": 7,
       "date": "5/2",
       "house": "こうすけ苗",
-      "variety": "紅まさり",
+      "variety": "B紅まさり",
       "count": 24
     },
     {
       "no": 8,
       "date": "5/3",
       "house": "こうすけ苗",
-      "variety": "紅まさり",
+      "variety": "B紅まさり",
       "count": 37
     },
     {
@@ -96,7 +96,7 @@
       "date": "5/7",
       "house": "5",
       "variety": "B黄金",
-      "count": 7.5
+      "count": 17.5
     },
     {
       "no": 15,
@@ -109,7 +109,7 @@
       "no": 16,
       "date": "5/8",
       "house": "5",
-      "variety": "紅まさり",
+      "variety": "種紅まさり",
       "count": 19
     },
     {
@@ -118,48 +118,6 @@
       "house": "4",
       "variety": "B黄金",
       "count": 6
-    },
-    {
-      "no": 18,
-      "date": "5/9",
-      "house": "4",
-      "variety": "たいがん",
-      "count": 15
-    },
-    {
-      "no": 19,
-      "date": "5/9",
-      "house": "中村",
-      "variety": "黄金",
-      "count": 16
-    },
-    {
-      "no": 20,
-      "date": "5/10",
-      "house": "3",
-      "variety": "B紅まさり",
-      "count": 7
-    },
-    {
-      "no": 21,
-      "date": "5/11",
-      "house": "3",
-      "variety": "みちしずく",
-      "count": 10
-    },
-    {
-      "no": 22,
-      "date": "5/12",
-      "house": "中村",
-      "variety": "みちしずく",
-      "count": 10
-    },
-    {
-      "no": 23,
-      "date": "5/12",
-      "house": "中村",
-      "variety": "黄金",
-      "count": 10
     }
   ],
   "plantData": [
@@ -298,86 +256,6 @@
       "field": "としのり",
       "count": 5,
       "note": "床側縦式"
-    },
-    {
-      "id": 18,
-      "naeRef": 8,
-      "date": "5/4",
-      "field": "エキ",
-      "count": 21,
-      "note": ""
-    },
-    {
-      "id": 19,
-      "naeRef": 10,
-      "date": "5/8",
-      "field": "久子",
-      "count": 2,
-      "note": ""
-    },
-    {
-      "id": 20,
-      "naeRef": 11,
-      "date": "5/8",
-      "field": "久子",
-      "count": 15,
-      "note": ""
-    },
-    {
-      "id": 21,
-      "naeRef": 15,
-      "date": "5/8",
-      "field": "久子",
-      "count": 17,
-      "note": ""
-    },
-    {
-      "id": 22,
-      "naeRef": 17,
-      "date": "5/9",
-      "field": "久子",
-      "count": 5,
-      "note": ""
-    },
-    {
-      "id": 23,
-      "naeRef": 19,
-      "date": "5/10",
-      "field": "ナツエ",
-      "count": 16,
-      "note": ""
-    },
-    {
-      "id": 24,
-      "naeRef": 13,
-      "date": "5/10",
-      "field": "ナツエ",
-      "count": 2,
-      "note": ""
-    },
-    {
-      "id": 25,
-      "naeRef": 14,
-      "date": "5/10",
-      "field": "ナツエ",
-      "count": 7.5,
-      "note": ""
-    },
-    {
-      "id": 26,
-      "naeRef": 18,
-      "date": "5/12",
-      "field": "正人黒山",
-      "count": 6,
-      "note": ""
-    },
-    {
-      "id": 27,
-      "naeRef": 16,
-      "date": "5/12",
-      "field": "トシ",
-      "count": 16,
-      "note": ""
     }
   ],
   "varietyOrder": [
@@ -387,7 +265,8 @@
     "紅まさり",
     "みちしずく",
     "たいがん",
-    "Bまさり"
+    "種B紅まさり",
+    "種紅まさり"
   ],
   "fieldMaster": [
     {
@@ -425,38 +304,23 @@
     {
       "name": "別府小",
       "note": ""
-    },
-    {
-      "name": "久子",
-      "note": ""
-    },
-    {
-      "name": "ナツエ",
-      "note": ""
-    },
-    {
-      "name": "トシ",
-      "note": ""
     }
   ],
   "hist": {
     "fields": [
-      "トシ",
-      "正人黒山",
-      "ナツエ",
-      "久子",
-      "エキ",
       "するき１",
+      "正人黒山",
       "としのり",
       "フキエ",
       "つやこ上",
       "するき２",
       "大川道",
+      "エキ",
       "別府小"
     ],
-    "lastField": "トシ",
-    "lastHouse": "中村",
-    "lastVariety": "黄金"
+    "lastField": "としのり",
+    "lastHouse": "4",
+    "lastVariety": ""
   },
-  "_pid": 28
+  "_pid": 18
 }
