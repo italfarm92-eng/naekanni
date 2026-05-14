@@ -448,6 +448,22 @@
       "field": "正人上",
       "count": 7,
       "note": ""
+    },
+    {
+      "id": 35,
+      "naeRef": 21,
+      "date": "5/14",
+      "field": "ナミ",
+      "count": 5,
+      "note": ""
+    },
+    {
+      "id": 36,
+      "naeRef": 22,
+      "date": "5/14",
+      "field": "ナミ",
+      "count": 10,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -523,10 +539,15 @@
     {
       "name": "正人上",
       "note": ""
+    },
+    {
+      "name": "ナミ",
+      "note": ""
     }
   ],
   "hist": {
     "fields": [
+      "ナミ",
       "正人上",
       "トシ",
       "するき2",
@@ -537,12 +558,11 @@
       "久子",
       "エキ",
       "するき１",
-      "としのり",
-      "フキエ"
+      "としのり"
     ],
-    "lastField": "正人上",
+    "lastField": "ナミ",
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 35
+  "_pid": 37
 }
