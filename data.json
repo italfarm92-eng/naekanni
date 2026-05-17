@@ -479,6 +479,14 @@
       "field": "コイタ",
       "count": 9,
       "note": ""
+    },
+    {
+      "id": 38,
+      "naeRef": 25,
+      "date": "5/15",
+      "field": "コイタ",
+      "count": 17,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -583,5 +591,5 @@
     "lastHouse": "中村",
     "lastVariety": "黄金"
   },
-  "_pid": 38
+  "_pid": 39
 }
