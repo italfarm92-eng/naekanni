@@ -531,6 +531,14 @@
       "field": "マサハル",
       "count": 3,
       "note": ""
+    },
+    {
+      "id": 41,
+      "naeRef": 27,
+      "date": "5/15",
+      "field": "コイタ",
+      "count": 5,
+      "note": ""
     }
   ],
   "varietyOrder": [
@@ -622,8 +630,8 @@
   ],
   "hist": {
     "fields": [
-      "マサハル",
       "コイタ",
+      "マサハル",
       "ナミ",
       "正人上",
       "トシ",
@@ -635,9 +643,9 @@
       "久子",
       "エキ"
     ],
-    "lastField": "マサハル",
+    "lastField": "コイタ",
     "lastHouse": "1",
     "lastVariety": "B黄金"
   },
-  "_pid": 41
+  "_pid": 42
 }
