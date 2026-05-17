@@ -181,6 +181,20 @@
       "house": "中村",
       "variety": "黄金",
       "count": 22
+    },
+    {
+      "no": 27,
+      "date": "5/17",
+      "house": "中村",
+      "variety": "黄金",
+      "count": 5
+    },
+    {
+      "no": 28,
+      "date": "5/15",
+      "house": "こうすけ苗",
+      "variety": "紅まさり",
+      "count": 32
     }
   ],
   "plantData": [
@@ -608,8 +622,8 @@
       "エキ"
     ],
     "lastField": "マサハル",
-    "lastHouse": "中村",
-    "lastVariety": "黄金"
+    "lastHouse": "こうすけ苗",
+    "lastVariety": "紅まさり"
   },
   "_pid": 41
 }
