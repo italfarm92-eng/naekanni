@@ -216,6 +216,13 @@
       "house": "1",
       "variety": "B黄金",
       "count": 8
+    },
+    {
+      "no": 32,
+      "date": "5/19",
+      "house": "2",
+      "variety": "B黄金",
+      "count": 21
     }
   ],
   "plantData": [
