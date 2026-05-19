@@ -209,6 +209,13 @@
       "house": "1",
       "variety": "B黄金",
       "count": 21
+    },
+    {
+      "no": 31,
+      "date": "5/18",
+      "house": "1",
+      "variety": "B黄金",
+      "count": 8
     }
   ],
   "plantData": [
@@ -652,7 +659,7 @@
       "エキ"
     ],
     "lastField": "正人上",
-    "lastHouse": "1",
+    "lastHouse": "2",
     "lastVariety": "B黄金"
   },
   "_pid": 43
